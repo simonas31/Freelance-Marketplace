@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -118,5 +119,19 @@ class JobsController extends Controller
         } else {
             return response()->json(['could not delete job'], 400);
         }
+    }
+
+    public function hUsersJobs($user_id, $job_id)
+    {
+        $user = User::find($user_id)?->get();
+        $job = Job::find($job_id)?->get();
+
+        if($user == null)
+            return response()->json(['Could not find user.'], 404);
+        
+        if($job == null)
+            return response()->json(['Could not find job.'], 404);
+
+        return response()->json(Job::where(['user_id' => $user_id, 'id' => $job_id])?->first());
     }
 }

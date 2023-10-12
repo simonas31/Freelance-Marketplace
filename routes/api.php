@@ -81,4 +81,13 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::put('ratings/{freelancer_id}', [RatingsController::class, 'update']);
     Route::delete('ratings/{rating_id}', [RatingsController::class, 'destroy']);
 
+    //hierachical connection
+    Route::get('users/{user_id}', [UsersController::class, 'specificUser']);
+    Route::get('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'hUsersChats']);
+    Route::get('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'hUsersChatsMessages']);
+
+    Route::get('users/{user_id}/jobs/{job_id}', [JobsController::class, 'hUsersJobs']);
+
+    Route::get('users/{user_id}/jobs/{job_id}/transactions/{transaction_id}', [TransactionsController::class, 'hUsersJobsTransactions']);
+    Route::get('users/{user_id}/jobs/{job_id}/hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'hUsersJobsHiredFreelancers']);
 });

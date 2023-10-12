@@ -76,4 +76,18 @@ class ChatsController extends Controller
             return response()->json(['could not delete chat'], 400);
         }
     }
+
+    public function hUsersChats($user_id, $chat_id)
+    {
+        $user = User::find($user_id)?->get();
+        $chat = Chat::find($chat_id)?->get();
+
+        if($user == null)
+            return response()->json(['Could not find user.'], 404);
+        
+        if($chat == null)
+            return response()->json(['Could not find chat.'], 404);
+
+        return response()->json(Chat::where(['user_id' => $user_id, 'id' => $chat_id])?->first());
+    }
 }

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Chat;
 use App\Models\Message;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -75,5 +77,25 @@ class MessagesController extends Controller
         } else {
             return response()->json(['could not delete message'], 400);
         }
+    }
+
+    public function hUsersChatsMessages($user_id, $chat_id, $message_id)
+    {
+        $user = User::find($user_id)?->get();
+        $chat = Chat::find($chat_id)?->get();
+        $message = Message::find($message_id)?->get();
+
+        if($user == null)
+            return response()->json(['Could not find user.'], 404);
+        
+        if($chat == null)
+            return response()->json(['Could not find chat.'], 404);
+
+        if($message == null)
+            return response()->json(['Could not find message.'], 404);
+
+        $chat = Chat::where(['user_id' => $user_id, 'id' => $chat_id])?->first();
+
+        return response()->json(Message::where(['chat_id' => $chat->id, 'id' => $message_id])?->first());
     }
 }

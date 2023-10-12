@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\HiredFreelancer;
+use App\Models\Job;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -83,5 +85,25 @@ class HiredFreelancersController extends Controller
         } else {
             return response()->json(['could not delete hired freelancer'], 400);
         }
+    }
+
+    public function hUsersJobsHiredFreelancers($user_id, $job_id, $hired_freelancer_id)
+    {
+        $user = User::find($user_id)?->get();
+        $job = Job::find($job_id)?->get();
+        $hf = HiredFreelancer::find($hired_freelancer_id)?->get();
+
+        if($user == null)
+            return response()->json(['Could not find user.'], 404);
+        
+        if($job == null)
+            return response()->json(['Could not find job.'], 404);
+
+        if($hf == null)
+            return response()->json(['Could not find hired freelancer.'], 404);
+
+        $job = Job::where(['user_id' => $user_id, 'id' => $job_id])?->first();
+
+        return response()->json(HiredFreelancer::where(['job_id' => $job->id, 'id' => $hired_freelancer_id])?->first());
     }
 }

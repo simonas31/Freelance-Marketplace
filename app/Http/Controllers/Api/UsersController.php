@@ -89,6 +89,16 @@ class UsersController extends Controller
         ]);
     }
 
+    public function specificUser($user_id)
+    {
+        $user = User::find($user_id)->get();
+
+        if($user == null)
+            return response()->json(['Could not find specific user.', 404]);
+
+        return response()->json($user);
+    }
+
     // User Profile (GET)
     public function user()
     {
