@@ -48,13 +48,12 @@ class JobsController extends Controller
     /**
      * Store a new resource.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user_id)
     {
         $validator = Validator::make($request->all(), [
             'description' => 'required|string',
             'work_fields' => 'required|string',
             'pay_amount' => 'required|integer',
-            'user_id' => 'required|integer',
         ]);
 
         if ($validator->fails())
@@ -65,7 +64,7 @@ class JobsController extends Controller
             'work_fields' => $request->input('work_fields'),
             'pay_amount' => $request->input('pay_amount'),
             'posted_time' => now(),
-            'user_id' => $request->input('user_id'),
+            'user_id' => $user_id,
         ]);
 
         return response()->json(['Job created successfully']);
@@ -79,7 +78,7 @@ class JobsController extends Controller
         //
         $job = Job::where('user_id', $user_id)->first();
         if($job == null)
-            return response()->json(['Could not find job']);
+            return response()->json(['Could not find job'], 404);
 
         return response()->json([$job]);
     }
@@ -89,19 +88,22 @@ class JobsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $job_id)
+    public function update(Request $request, $user_id, $job_id)
     {
         $validator = Validator::make($request->all(), [
             'transaction_id' => 'required|integer',
         ]);
 
         if ($validator->fails())
-            return response()->json(['Check if input data is filled'], 406);
+            return response()->json('Check if input data is filled', 406);
 
-        if(Job::where('id', $job_id)->first() == null)
-            return response()->json(['Could not find job']);
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
 
-        Job::where('id', $job_id)
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
+        Job::where(['id' => $job_id, 'user_id' => $user_id])
             ->update([
                 'transaction_id' => $request->input('transaction_id')
             ]);
@@ -112,16 +114,23 @@ class JobsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($job_id)
+    public function destroy($user_id, $job_id)
     {
-        if (Job::find($job_id)?->delete()) {
+        if(User::find($user_id)?->first() == null)
+        return response()->json('Could not find user');
+
+        $job = Job::where(['id' => $job_id, 'user_id' => $user_id])?->first();
+        if(empty($job))
+            return response()->json('Could not find user job');
+
+        if ($job?->delete()) {
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete job'], 400);
         }
     }
 
-    public function hUsersJobs($user_id, $job_id)
+    public function UserJob($user_id, $job_id)
     {
         $user = User::find($user_id)?->get();
         $job = Job::find($job_id)?->get();
@@ -130,8 +139,22 @@ class JobsController extends Controller
             return response()->json(['Could not find user.'], 404);
         
         if($job == null)
-            return response()->json(['Could not find job.'], 404);
+            return response()->json(['Could not find user job.'], 404);
 
         return response()->json(Job::where(['user_id' => $user_id, 'id' => $job_id])?->first());
+    }
+
+    public function listUserJobs($user_id){
+        $user = User::find($user_id)?->first();
+
+        if($user == null)
+            return response()->json('User doesnt exist', 404);
+
+        $chats = Job::where('user_id', $user_id)->get()->toArray();
+
+        if(empty($chats))
+            return response()->json('User does not have any jobs', 404);
+
+        return response()->json($chats);
     }
 }

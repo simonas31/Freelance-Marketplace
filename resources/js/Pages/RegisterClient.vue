@@ -139,7 +139,7 @@ export default {
             let errorLi = document.getElementById('username-exists1');
             errorLi.parentElement.setAttribute('hidden', true);
 
-            const response = await axios.post('/api/register',
+            const response = await axios.post('/api/users',
             {
                 username: e.username,
                 name: e.name,

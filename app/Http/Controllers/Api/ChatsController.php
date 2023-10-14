@@ -21,18 +21,22 @@ class ChatsController extends Controller
     /**
      * Store a new resource.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user_id)
     {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer',
             'receiver' => 'required|integer',
         ]);
 
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        $user = User::find($user_id)?->get();
+
+        if($user == null)
+            return response()->json('Could not find user', 404);
+
         Chat::create([
-            'user_id' => $request->input('user_id'),
+            'user_id' => $user_id,
             'receiver' => $request->input('receiver'),
         ]);
 
@@ -54,9 +58,19 @@ class ChatsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $chat_id)
+    public function update(Request $request, $user_id, $chat_id)
     {
-        Chat::where('id', $chat_id)
+        $user = User::find($user_id)?->get();
+
+        if($user == null)
+            return response()->json('Could not find user', 404);
+
+        $chat = Chat::find($chat_id)?->get();
+
+        if($chat == null)
+            return response()->json('Could not find user chat', 404);
+
+        Chat::where(['user_id' => $user_id, 'id' => $chat_id])
             ->update([
                 'deleted' => 1
             ]);
@@ -67,9 +81,15 @@ class ChatsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($chat_id)
+    public function destroy($user_id, $chat_id)
     {
+        $user = User::find($user_id)?->get();
+
+        if($user == null)
+            return response()->json('could not find user', 404);
+
         $chat = Chat::find($chat_id)?->first();
+
         if ($chat != null && $chat->deleted && $chat->delete()) {
             return response()->json(['deleted successfully']);
         } else {
@@ -77,7 +97,7 @@ class ChatsController extends Controller
         }
     }
 
-    public function hUsersChats($user_id, $chat_id)
+    public function UserChat($user_id, $chat_id)
     {
         $user = User::find($user_id)?->get();
         $chat = Chat::find($chat_id)?->get();
@@ -89,5 +109,19 @@ class ChatsController extends Controller
             return response()->json(['Could not find chat.'], 404);
 
         return response()->json(Chat::where(['user_id' => $user_id, 'id' => $chat_id])?->first());
+    }
+
+    public function listUserChats($user_id){
+        $user = User::find($user_id)?->first();
+
+        if($user == null)
+            return response()->json('User doesnt exist', 404);
+
+        $chats = Chat::where('user_id', $user_id)->get()->toArray();
+
+        if(empty($chats))
+            return response()->json('User does not have any chats', 404);
+
+        return response()->json($chats);
     }
 }

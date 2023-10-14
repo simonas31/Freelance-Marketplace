@@ -14,32 +14,46 @@ class TransactionsController extends Controller
     /**
      * Display a listing of the resource. For admin.
      */
-    public function index()
+    public function listUserJobTransactions($user_id, $job_id)
     {
-        return response()->json(Transaction::all()->toArray());
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
+        $txs = Transaction::where(['user_id' => $user_id, 'job_id' => $job_id])?->get()->toArray();
+        if(empty($txs))
+            return response()->json('Could not find user job transaction', 404);
+        
+        return response()->json($txs);
     }
 
     /**
      * Store a new resource.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user_id, $job_id)
     {
         $validator = Validator::make($request->all(), [
             'amount' => 'required',
-            'user_id' => 'required',
             'receiver' => 'required',
-            'job_id' => 'required'
         ]);
 
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
         Transaction::create([
             'tax' => 2,
             'amount' => $request->input('amount'),
-            'user_id' => $request->input('user_id'),
+            'user_id' => $user_id,
             'receiver' => $request->input('receiver'),
-            'job_id' => $request->input('job_id')
+            'job_id' => $job_id
         ]);
 
         return response()->json(['Transaction created successfully']);
@@ -58,8 +72,17 @@ class TransactionsController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $transaction_id)
-    {
+    public function update($user_id, $job_id, $transaction_id)
+    {       
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
+        if(empty(Transaction::where(['id' => $transaction_id, 'user_id' => $user_id, 'job_id' => $job_id])?->first()))
+            return response()->json('Could not find user job transaction', 404);
+        
         Transaction::where('id', $transaction_id)
             ->update([
                 'completed' => 1
@@ -71,16 +94,26 @@ class TransactionsController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($transaction_id)
+    public function destroy($user_id, $job_id, $transaction_id)
     {
-        if (Transaction::find($transaction_id)?->delete()) {
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
+        $tx = Transaction::where(['id' => $transaction_id, 'user_id' => $user_id, 'job_id' => $job_id])?->first();
+        if(empty($tx))
+            return response()->json('Could not find user job transaction', 404);
+        
+        if ($tx?->delete()) {
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete transaction'], 404);
         }
     }
 
-    public function hUsersJobsTransactions($user_id, $job_id, $transaction_id)
+    public function UserJobTransaction($user_id, $job_id, $transaction_id)
     {
         $user = User::find($user_id)?->get();
         $job = Job::find($job_id)?->get();
@@ -90,10 +123,10 @@ class TransactionsController extends Controller
             return response()->json(['Could not find user.'], 404);
         
         if($job == null)
-            return response()->json(['Could not find job.'], 404);
+            return response()->json(['Could not find user job.'], 404);
 
         if($tx == null)
-            return response()->json(['Could not find transaction.'], 404);
+            return response()->json(['Could not find user job transaction.'], 404);
 
         $job = Job::where(['user_id' => $user_id, 'id' => $job_id])?->first();
 

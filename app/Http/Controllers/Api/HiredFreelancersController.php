@@ -14,33 +14,47 @@ class HiredFreelancersController extends Controller
     /**
      * Display a listing of the resource. For admin.
      */
-    public function index()
+    public function listUserJobHireFreelancers($user_id, $job_id)
     {
-        return response()->json(HiredFreelancer::all());
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+        
+        $hfs = HiredFreelancer::where(['client_id' => $user_id, 'job_id' => $job_id])?->get()->toArray();
+        if(empty($hfs))
+            return response()->json('Could not find user job hired freelancers', 404);
+        
+        return response()->json($hfs);
     }
 
     /**
      * Store a new resource.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user_id, $job_id)
     {
         $validator = Validator::make($request->all(), [
             'freelancer_id' => 'required|integer',
-            'client_id' => 'required|integer',
-            'job_id' => 'required|integer',
         ]);
 
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
         HiredFreelancer::create([
             'freelancer_id' => $request->input('freelancer_id'),
-            'client_id' => $request->input('client_id'),
-            'job_id' => $request->input('job_id'),
+            'client_id' => $user_id,
+            'job_id' => $job_id,
             'hire_date' => now()
         ]);
 
-        return response()->json(['entity created successfully']);
+        return response()->json(['hired freelancer created successfully']);
     }
 
     /**
@@ -62,15 +76,21 @@ class HiredFreelancersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $hired_freelancer_id)
+    public function update($user_id, $job_id, $hired_freelancer_id)
     {
-        if(HiredFreelancer::where('id', $hired_freelancer_id)->first() == null)
-            return response()->json(['Could not find hired freelancer']);
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
 
-        HiredFreelancer::where('id', $hired_freelancer_id)
-            ->update([
-                'hire_date' => now()
-            ]);
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+        
+        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'client_id' => $user_id])?->first();
+        if(empty($hf))
+            return response()->json('Could not find user job hired freelancer.', 404);
+
+        $hf->update([
+            'hire_date' => now()
+        ]);
 
         return response()->json(['updated successfully']);
     }
@@ -78,32 +98,37 @@ class HiredFreelancersController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($hired_freelancer_id)
+    public function destroy($user_id, $job_id, $hired_freelancer_id)
     {
-        if (HiredFreelancer::find($hired_freelancer_id)?->delete()) {
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
+
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+        
+        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'client_id' => $user_id])?->first();
+        if(empty($hf))
+            return response()->json('Could not find user job hired freelancer.', 404);
+        
+        if ($hf?->delete()) {
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete hired freelancer'], 400);
         }
     }
 
-    public function hUsersJobsHiredFreelancers($user_id, $job_id, $hired_freelancer_id)
+    public function UserJobHiredFreelancer($user_id, $job_id, $hired_freelancer_id)
     {
-        $user = User::find($user_id)?->get();
-        $job = Job::find($job_id)?->get();
-        $hf = HiredFreelancer::find($hired_freelancer_id)?->get();
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user', 404);
 
-        if($user == null)
-            return response()->json(['Could not find user.'], 404);
-        
-        if($job == null)
-            return response()->json(['Could not find job.'], 404);
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
 
-        if($hf == null)
-            return response()->json(['Could not find hired freelancer.'], 404);
+        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'client_id' => $user_id])?->first();
+        if(empty($hf))
+            return response()->json('Could not find user job hired freelancer.', 404);
 
-        $job = Job::where(['user_id' => $user_id, 'id' => $job_id])?->first();
-
-        return response()->json(HiredFreelancer::where(['job_id' => $job->id, 'id' => $hired_freelancer_id])?->first());
+        return response()->json($hf);
     }
 }

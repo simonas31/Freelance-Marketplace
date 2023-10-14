@@ -24,21 +24,13 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::post("login", [UsersController::class, "login"]);
-Route::post("register", [UsersController::class, "register"]);
+Route::post("users", [UsersController::class, "register"]);
 
 Route::group(["middleware" => ["auth:api"]], function () {
     Route::get('freelancers', [UsersController::class, 'freelancers']);
     Route::get("auth", [UsersController::class, "user"]);
     Route::get("refresh", [UsersController::class, "refreshToken"]);
     Route::get("logout", [UsersController::class, "logout"]);
-    Route::delete('users/{user_id}', [UsersController::class, 'delete']);
-    Route::put('users/{user_id}', [UsersController::class, 'updateRating']);
-
-    Route::get('transactions', [TransactionsController::class, 'index']);
-    Route::post('transactions', [TransactionsController::class, 'store']);
-    Route::get('transactions/{transaction_id}', [TransactionsController::class, 'show']);
-    Route::put('transactions/{transaction_id}', [TransactionsController::class, 'update']);
-    Route::delete('transactions/{transaction_id}', [TransactionsController::class, 'destroy']);
 
     Route::get('profiles', [ProfilesController::class, 'index']);
     Route::post('profiles', [ProfilesController::class, 'store']);
@@ -52,29 +44,6 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::put('portfolios/{user_id}', [PortfoliosController::class, 'update']);
     Route::delete('portfolios/{user_id}', [PortfoliosController::class, 'destroy']);
 
-    Route::get('messages/{chat_id}', [MessagesController::class, 'show_messages']);
-    Route::post('messages', [MessagesController::class, 'store']);
-    Route::put('messages/{message_id}', [MessagesController::class, 'update']);
-    Route::delete('messages/{message_id}', [MessagesController::class, 'delete']);
-    
-    Route::get('jobs', [JobsController::class, 'index']);
-    Route::post('jobs', [JobsController::class, 'store']);
-    Route::get('jobs/{job_id}', [JobsController::class, 'show']);
-    Route::put('jobs/{job_id}', [JobsController::class, 'update']);
-    Route::delete('jobs/{job_id}', [JobsController::class, 'destroy']);
-
-    Route::get('hiredfreelancers', [HiredFreelancersController::class, 'index']);
-    Route::post('hiredfreelancers', [HiredFreelancersController::class, 'store']);
-    Route::get('hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'show']);
-    Route::put('hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'update']);
-    Route::delete('hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'destroy']);
-
-    Route::get('chats', [ChatsController::class, 'index']);
-    Route::post('chats', [ChatsController::class, 'store']);
-    Route::get('chats/{chat_id}', [ChatsController::class, 'show']);
-    Route::put('chats/{chat_id}', [ChatsController::class, 'update']);
-    Route::delete('chats/{chat_id}', [ChatsController::class, 'destroy']);
-
     Route::get('ratings', [RatingsController::class, 'index']);
     Route::post('ratings', [RatingsController::class, 'store']);
     Route::get('ratings/{freelancer_id}', [RatingsController::class, 'show']);
@@ -82,12 +51,39 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::delete('ratings/{rating_id}', [RatingsController::class, 'destroy']);
 
     //hierachical connection
+    Route::get('users', [UsersController::class, 'listUsers']);
     Route::get('users/{user_id}', [UsersController::class, 'specificUser']);
-    Route::get('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'hUsersChats']);
-    Route::get('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'hUsersChatsMessages']);
+    Route::delete('users/{user_id}', [UsersController::class, 'delete']);
+    Route::put('users/{user_id}', [UsersController::class, 'updateRating']);
 
-    Route::get('users/{user_id}/jobs/{job_id}', [JobsController::class, 'hUsersJobs']);
+    Route::get('users/{user_id}/chats', [ChatsController::class, 'listUserChats']);
+    Route::post('users/{user_id}/chats', [ChatsController::class, 'store']);
+    Route::put('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'update']);
+    Route::delete('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'destroy']);
+    Route::get('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'UserChat']);
+    
+    Route::get('users/{user_id}/chats/{chat_id}/messages', [MessagesController::class, 'listUserChatMessages']);
+    Route::post('users/{user_id}/chats/{chat_id}/messages', [MessagesController::class, 'store']);
+    Route::put('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'update']);
+    Route::delete('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'delete']);
+    Route::get('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'UserChatMessage']);
 
-    Route::get('users/{user_id}/jobs/{job_id}/transactions/{transaction_id}', [TransactionsController::class, 'hUsersJobsTransactions']);
-    Route::get('users/{user_id}/jobs/{job_id}/hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'hUsersJobsHiredFreelancers']);
+    Route::get('jobs', [JobsController::class, 'index']);
+    Route::get('users/{user_id}/jobs', [JobsController::class, 'listUserJobs']);
+    Route::post('users/{user_id}/jobs', [JobsController::class, 'store']);
+    Route::put('users/{user_id}/jobs/{job_id}', [JobsController::class, 'update']);
+    Route::delete('users/{user_id}/jobs/{job_id}', [JobsController::class, 'destroy']);
+    Route::get('users/{user_id}/jobs/{job_id}', [JobsController::class, 'UserJob']);
+
+    Route::get('users/{user_id}/jobs/{job_id}/transactions', [TransactionsController::class, 'listUserJobTransactions']);
+    Route::post('users/{user_id}/jobs/{job_id}/transactions', [TransactionsController::class, 'store']);
+    Route::put('users/{user_id}/jobs/{job_id}/transactions/{transaction_id}', [TransactionsController::class, 'update']);
+    Route::delete('users/{user_id}/jobs/{job_id}/transactions/{transaction_id}', [TransactionsController::class, 'destroy']);
+    Route::get('users/{user_id}/jobs/{job_id}/transactions/{transaction_id}', [TransactionsController::class, 'UserJobTransaction']);
+
+    Route::get('users/{user_id}/jobs/{job_id}/hiredfreelancers', [HiredFreelancersController::class, 'listUserJobHireFreelancers']);
+    Route::post('users/{user_id}/jobs/{job_id}/hiredfreelancers', [HiredFreelancersController::class, 'store']);
+    Route::put('users/{user_id}/jobs/{job_id}/hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'update']);
+    Route::delete('users/{user_id}/jobs/{job_id}/hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'destroy']);
+    Route::get('users/{user_id}/jobs/{job_id}/hiredfreelancers/{hired_freelancer_id}', [HiredFreelancersController::class, 'UserJobHiredFreelancer']);
 });

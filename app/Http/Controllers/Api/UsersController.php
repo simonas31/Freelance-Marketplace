@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\DTO\UsersDTO;
 use App\Http\Controllers\Controller;
+use App\Models\Chat;
 use App\Models\Portfolio;
 use App\Models\Profile;
 use App\Models\Rating;
@@ -91,10 +92,10 @@ class UsersController extends Controller
 
     public function specificUser($user_id)
     {
-        $user = User::find($user_id)->get();
+        $user = User::find($user_id);
 
         if($user == null)
-            return response()->json(['Could not find specific user.', 404]);
+            return response()->json(['Could not find specific user.'], 404);
 
         return response()->json($user);
     }
@@ -165,10 +166,16 @@ class UsersController extends Controller
 
         if($avg_rating != null)
         {
-            User::find($user_id)->update(['rating' => $avg_rating]);
+            $user = User::find($user_id)->first();
+            $user->rating = $avg_rating;
+            $user->save();
             return response()->json(['User rating updated successfuly']);
         }
         return response()->json(['Could not find user or user is not rated'], 400);
+    }
+
+    public function listUsers(){
+        return response()->json(User::all());
     }
 
     public function delete($user_id){

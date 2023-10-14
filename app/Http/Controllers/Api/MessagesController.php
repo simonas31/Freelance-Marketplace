@@ -22,21 +22,25 @@ class MessagesController extends Controller
     /**
      * Store a new resource.
      */
-    public function store(Request $request)
+    public function store(Request $request, $user_id, $chat_id)
     {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|integer',
-            'chat_id' => 'required|integer',
             'text' => 'required|string',
         ]);
 
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        if(User::find($user_id)?->get() == null)
+            return response()->json('Could not find user', 404);
+
+        if(Chat::find($chat_id)?->get() == null)
+            return response()->json('Could not find user chat', 404);
+        
         //return response()->json($request->all());
         Message::create([
-            'user_id' => $request->input('user_id'),
-            'chat_id' => $request->input('chat_id'),
+            'user_id' => $user_id,
+            'chat_id' => $chat_id,
             'text' => $request->input('text'),
             'send_time' => now()
         ]);
@@ -47,7 +51,7 @@ class MessagesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $message_id)
+    public function update(Request $request, $user_id, $chat_id, $message_id)
     {
         $validator = Validator::make($request->all(), [
             'text' => 'required|string',
@@ -56,8 +60,14 @@ class MessagesController extends Controller
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
-        if(Message::where('id', $message_id)->first() == null)
-            return response()->json(['Could not find message'], 404);
+        if(User::find($user_id)?->get() == null)
+            return response()->json('Could not find user', 404);
+
+        if(Chat::find($chat_id)?->get() == null)
+            return response()->json('Could not find user chat', 404);
+            
+        if(Message::where('id', $message_id)?->first() == null)
+            return response()->json('Could not find message', 404);
 
         Message::where('id', $message_id)
             ->update([
@@ -70,32 +80,62 @@ class MessagesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function delete($message_id)
+    public function delete($user_id, $chat_id, $message_id)
     {
-        if (Message::find($message_id)?->delete()) {
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user.', 404);
+
+        if(empty(Chat::where(['id' => $chat_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user chat.', 404);
+            
+        $message = Message::where([
+            'id' => $message_id,
+            'user_id' => $user_id,
+            'chat_id' => $chat_id
+        ])?->first();
+
+        if($message == null)
+            return response()->json(['Could not find message'], 404);
+
+        if ($message->delete()) {
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete message'], 400);
         }
     }
 
-    public function hUsersChatsMessages($user_id, $chat_id, $message_id)
+    public function UserChatMessage($user_id, $chat_id, $message_id)
     {
-        $user = User::find($user_id)?->get();
-        $chat = Chat::find($chat_id)?->get();
-        $message = Message::find($message_id)?->get();
+        if(User::find($user_id)?->first() == null)
+            return response()->json('Could not find user.', 404);
 
-        if($user == null)
-            return response()->json(['Could not find user.'], 404);
-        
-        if($chat == null)
-            return response()->json(['Could not find chat.'], 404);
+        if(empty(Chat::where(['id' => $chat_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user chat.', 404);
+
+        $message = Message::where([
+            'id' => $message_id,
+            'user_id' => $user_id,
+            'chat_id' => $chat_id
+        ])?->first();
 
         if($message == null)
-            return response()->json(['Could not find message.'], 404);
+            return response()->json('Could not find user chat message.', 404);
 
-        $chat = Chat::where(['user_id' => $user_id, 'id' => $chat_id])?->first();
+        return response()->json($message);
+    }
 
-        return response()->json(Message::where(['chat_id' => $chat->id, 'id' => $message_id])?->first());
+    public function listUserChatMessages($user_id, $chat_id){
+        if(User::find($user_id)?->first() == null)
+            return response()->json('User doesnt exist', 404);
+        
+        if(Chat::where('user_id', $user_id)?->first() == null)
+            return response()->json('User does not have any chats', 404);
+
+        $messages = Message::where('chat_id', $chat_id)->get()->toArray();
+
+        if(empty($messages))
+            return response()->json('User does not have any messages', 404);
+
+        return response()->json($messages);
     }
 }
