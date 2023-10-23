@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -21,26 +22,27 @@ class ChatsController extends Controller
     /**
      * Store a new resource.
      */
-    public function store(Request $request, $user_id)
+    public function store(Request $request, $user_id, $receiver)
     {
-        $validator = Validator::make($request->all(), [
-            'receiver' => 'required|integer',
-        ]);
-
-        if ($validator->fails())
-            return response()->json(['Check if input data is filled'], 406);
-
         $user = User::find($user_id)?->get();
 
         if($user == null)
             return response()->json('Could not find user', 404);
 
-        Chat::create([
+        $chat = Chat::where([
             'user_id' => $user_id,
-            'receiver' => $request->input('receiver'),
+            'receiver' => $receiver
+        ])->first();
+
+        if($chat != null)
+            return response()->json($chat);
+
+        $chat = Chat::create([
+            'user_id' => $user_id,
+            'receiver' => $receiver,
         ]);
 
-        return response()->json(['chat created successfully']);
+        return response()->json($chat);
     }
 
     /**
@@ -90,7 +92,11 @@ class ChatsController extends Controller
 
         $chat = Chat::find($chat_id)?->first();
 
-        if ($chat != null && $chat->deleted && $chat->delete()) {
+
+        if ($chat != null && $chat->deleted) {
+            $chat->delete();
+            Message::where('chat_id', $chat_id)->delete();
+            
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete chat'], 400);

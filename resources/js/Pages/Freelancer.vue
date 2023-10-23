@@ -1,20 +1,39 @@
 <script setup>
-const { freelancer } = defineProps(['freelancer']);
+const { freelancer, client_id } = defineProps(['freelancer', 'client_id']);
 
-const isRating = ref(false);
-const userRating = ref(null);
+const userRating = ref(0);
 const overallRating = ref(null);
-const store = useStore();
-const user = computed(() => store.state.user);
+const hoveredStars = ref(0);
 
 const rate = async (rating) => {
-    console.log(rating);
+    axios.post(`api/ratings`, {
+        client_id: client_id,
+        freelancer_id: freelancer.id,
+        rating: rating
+    })
+    .then((response) => {
+        fetchOverallRating();
+        hoveredStars.value = rating;
+        userRating.value = rating;
+    });
 }
+
+const hoverStars = (n) => {
+    hoveredStars.value = n;
+};
+
+const unhoverStars = () => {
+    hoveredStars.value = userRating.value;
+};
+
+const isStarHovered = (n) => {
+    return n <= hoveredStars.value;
+};
 
 const fetchOverallRating = async () => {
     axios.get(`api/ratings/${freelancer.id}`)
     .then((response) => {
-        overallRating.value = response.data.rating;
+        overallRating.value = response.data;
     })
     .catch((e) => {
 
@@ -22,9 +41,10 @@ const fetchOverallRating = async () => {
 }
 
 const fetchUserRating = async () => {
-    axios.get(`api/ratings/${freelancer.id}/${user.value.id}`)
+    axios.get(`api/ratings/${freelancer.id}/${client_id}`)
     .then((response) => {
-        userRating.value = response.data.rating;
+        userRating.value = response.data;
+        hoverStars(userRating.value);
     })
     .catch((e) => {
 
@@ -32,20 +52,20 @@ const fetchUserRating = async () => {
 }
 
 onMounted(() => {
-    fetchUserRating()
+    fetchUserRating();
+    fetchOverallRating();
 });
 </script>
 <template>
     <Layout>
         <div class="flex-wrap content-center bg-white my-10">
             <div class="grid">
-                {{ freelancer }}
                 <div class="container mx-auto">
                     <div class="my-10">
                         <h1 class="mb-4 text-2xl text-center font-extrabold leading-none tracking-tight text-gray-900">Freelancer</h1>
                         <p class="mb-6 text-lg text-center font-normal text-gray-500">
                             {{ freelancer?.name + " " + freelancer?.surname }}
-                            {{ freelancer?.rating != null ? "(Rating " + freelancer?.rating + ")" : "(unrated)" }}
+                            {{ overallRating != null ? "(Rating " + overallRating + ")" : "(unrated)" }}
                         </p>
                         <div class="mb-2 text-center">
                             <div>
@@ -53,7 +73,13 @@ onMounted(() => {
                             </div>
                             <div>
                                 <div v-for="n in 10" class="flex-wrap inline-flex" id="userRating">
-                                    <div @click="rate(n)" class="opacity-25 hover:opacity-100">
+                                    <div
+                                        @mouseenter="hoverStars(n)"
+                                        @mouseleave="unhoverStars(n)" 
+                                        @click="rate(n)" 
+                                        :class="{'opacity-25': !isStarHovered(n), 'hover:opacity-100': isStarHovered(n)}"
+                                        class=" cursor-pointer"
+                                    >
                                         &#11088;
                                     </div>
                                 </div>
@@ -96,8 +122,7 @@ onMounted(() => {
 <script>
 import axios from 'axios';
 import Layout from '../Layout/Layout.vue';
-import { defineProps, ref, onMounted, computed } from 'vue';
-import { useStore } from 'vuex';
+import { defineProps, ref, onMounted } from 'vue';
 export default {
     components: { Layout },
     title: 'Home',

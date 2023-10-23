@@ -81,7 +81,7 @@ onMounted(() => {
                 </div>
 
                 <div class="flex justify-center mb-10">
-                    <div class="grid grid-cols-3 gap-2 items-center"><!--filter-->
+                    <div class="grid grid-cols-3 gap-2 items-center">
                         <div class="w-64">
                             <Multiselect v-model="selectedWorkFields"
                                     placeholder="Desired Work Field(s)" 
@@ -139,6 +139,13 @@ onMounted(() => {
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.pay_amount }}€</td>
                                 <td class="px-6 py-4 break-words max-w-md whitespace-no-wrap border-b border-gray-200">{{ job.description }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.posted_time }}</td>
+                                <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                    <button
+                                        @click.stop="hire(freelancer.id)"
+                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
+                                        Hire
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

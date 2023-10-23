@@ -45,6 +45,7 @@ const logout = async () => {
             </li>
             <li v-show="role == CLIENT">
                 <Link href="/create-job" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Create Job</Link>
+                <Link href="/your-jobs" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Your Jobs</Link>
             </li>
         </ul>
         <div class="py-2">

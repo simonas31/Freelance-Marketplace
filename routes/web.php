@@ -5,6 +5,8 @@ use App\Http\Controllers\JobsController;
 use App\Http\Controllers\PortfoliosController;
 use App\Http\Controllers\ProfilesController;
 use App\Http\Controllers\UsersController;
+use App\Models\Chat;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -18,7 +20,6 @@ use Inertia\Inertia;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/test', [ApiPortfoliosController::class, 'index']);
 Route::get('/', function () {
     return Inertia::render('Index');
 });
@@ -36,6 +37,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('freelancers/{freelancer_id}', [UsersController::class, 'find']);
     Route::get('profile', [ProfilesController::class, 'index']);
     Route::get('portfolio', [PortfoliosController::class, 'index']);
+    Route::get('create-job', [JobsController::class, 'create']);
+    Route::get('your-jobs', [JobsController::class, 'userJobs']);
 });
 
 Route::get('{slug}', function () {

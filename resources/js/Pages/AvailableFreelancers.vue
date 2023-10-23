@@ -17,6 +17,7 @@ const experience = [{ label: '1 year', value: 1 },
 const freelancers = ref([]);
 const isLoading = ref(true);
 const message = ref('Loading...');
+const showChatModals = ref([]);
 const selectedWorkFields = ref(null);
 const selectedExperience = ref(null);
 const store = useStore();
@@ -26,10 +27,15 @@ const role = computed(() => user.value.role);
 
 const fetchFreelancers = async() => {
     try {
-        const response = await axios.get('api/freelancers'); // Replace with your API endpoint
-        const data = await response.data;
-        freelancers.value = data;
-        isLoading.value = false;
+        await axios.get('api/freelancers')
+        .then((response) => {
+            const data = response.data;
+            freelancers.value = data;
+            isLoading.value = false;
+            for(let i = 0; i < data.length; i++){
+                showChatModals.value.push(false);
+            }
+        }); // Replace with your API endpoint
     } catch (err) {
         message.value = 'Error fetching data from the API.';
         isLoading.value = false;
@@ -73,13 +79,10 @@ const reset = async () => {
 }
 
 const remove = async (freelancerID) => {
-    await axios.delete(`api/freelancers/${freelancerID}`)
+    await axios.delete(`api/users/${freelancerID}`)
     .then((response) => {
-
+        router.get('/freelancers');
     })
-    .catch((e) => {
-
-    });
 }
 
 const hire = async (freelancerID) => {
@@ -90,6 +93,19 @@ const hire = async (freelancerID) => {
     .catch((e) => {
 
     });
+}
+
+const toggleChatModal = (chatModalId) => {
+    if(!showChatModals[chatModalId]){
+        for(let i = 0; i < showChatModals.value.length; i++){
+            showChatModals.value[i] = false;
+        }
+        showChatModals.value[chatModalId] = true;
+    }
+};
+
+const closeChatModal = (chatModalId) =>{
+    showChatModals.value[chatModalId] = false;
 }
 
 onMounted(() => {
@@ -152,7 +168,7 @@ onMounted(() => {
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-for="freelancer in freelancers">
+                        <tbody v-for="(freelancer, index) in freelancers">
                             <tr @click="find(freelancer.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.name + ' ' +freelancer.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.country }}</td>
@@ -163,16 +179,29 @@ onMounted(() => {
                                 <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <button v-if="role == CLIENT"
                                         @click.stop="hire(freelancer.id)"
-                                        class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4">
+                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
                                         Hire
                                     </button>
-                                    <button v-if="role == ADMIN"
+                                    <button v-if="role == CLIENT"
+                                        @click.stop="toggleChatModal(index)"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mr-4"
+                                    >
+                                        Chat
+                                    </button>
+                                    <button v-if="role == CLIENT"
                                         @click.stop="remove(freelancer.id)"
                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                         Remove
                                     </button>
                                 </td>
                             </tr>
+                            <ChatModal 
+                                :freelancer_id="freelancer.id"
+                                :show_Chat="showChatModals[index]"
+                                :modal-id="index"
+                                :receiver="[freelancer.name, freelancer.surname]"
+                                @close-chat-modal="closeChatModal(index)"
+                            ></ChatModal>
                         </tbody>
                     </table>
                 </div>
@@ -182,6 +211,7 @@ onMounted(() => {
 </template>
 <script>
 import Layout from '../Layout/Layout.vue';
+import ChatModal from '../Components/ChatModal.vue';
 import { FormKit } from '@formkit/vue';
 import Multiselect from '@vueform/multiselect';
 import axios from 'axios';
@@ -194,7 +224,7 @@ export default {
     methods: {
         find(id){
             router.get('freelancers/' + id);
-        }
+        },
     }
 }
 </script>

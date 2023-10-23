@@ -38,8 +38,10 @@ class UsersController extends Controller
             'portfolios.resume',
         );
 
+        $client = auth()->id();
         return Inertia::render('Freelancer',[
-            'freelancer' => $freelancer->get()->first()
+            'freelancer' => $freelancer->get()->first(),
+            'client_id' => $client
         ]);
     }
     /**

@@ -22,24 +22,7 @@ class ProfilesController extends Controller
      */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'amount' => 'required',
-            'sender' => 'required',
-            'receiver' => 'required',
-            'job_id' => 'required'
-        ]);
-
-        if ($validator->fails())
-            return response()->json(['Check if input data is filled'], 406);
-
-        Profile::create([
-            'amount' => $request->input('amount'),
-            'sender' => $request->input('sender'),
-            'receiver' => $request->input('receiver'),
-            'job_id' => $request->input('job_id')
-        ]);
-
-        return response()->json(['Profile created successfully']);
+        
     }
 
     /**
@@ -70,7 +53,6 @@ class ProfilesController extends Controller
             'country' => 'required|string',
             'address' => 'required|string',
             'iban' => 'required|string',
-            //'picture' => 'required'
         ]);
 
         if ($validator->fails())

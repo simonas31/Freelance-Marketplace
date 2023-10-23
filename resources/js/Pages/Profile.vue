@@ -5,7 +5,7 @@ const { userID } = defineProps(['userID']);
 const country = ref(null);
 const address = ref(null);
 const iban = ref(null);
-const image = ref([]);
+const image = ref(null);
 const imageUrl = ref(null);
 
 const fetchProfile = () => {
@@ -15,7 +15,9 @@ const fetchProfile = () => {
             address.value = response.data.address
             iban.value = response.data.iban
             if(response.data.profile_picture != ""){
-                imageUrl.value = `data:image/png;base64,${response.data.profile_picture}`
+                document.getElementsByClassName('formkit-no-files')[0].innerHTML = 'Your image.'
+                image.value = response.data.profile_picture;
+                imageUrl.value = 'data:image/png;base64,' + response.data.profile_picture;
             }
         });
 }
@@ -24,11 +26,17 @@ const handleFileChange = (e) => {
     const file = e.target.files[0];
     imageUrl.value = URL.createObjectURL(file);
 }
-
+ 
 const save = async (e) => {
     let settings = { headers: { 'Content-Type': 'multipart/form-data' } };
     const formData = new FormData();
     formData.append('_method', 'PUT');
+    if(imageUrl.value != null && country.value != null && iban.value && address.value){
+        document.getElementById('noImage').hidden = true;
+    }else if(imageUrl.value == null){
+        document.getElementById('noImage').hidden = false;
+    }
+
     formData.append('country', country.value);
     formData.append('iban', iban.value);
     formData.append('address', address.value);
@@ -38,7 +46,6 @@ const save = async (e) => {
         country: country.value,
         iban: iban.value,
         address: address.value,
-        picture: e.picture[0].file
     }, settings)
         .then(function (response) {
             let p = document.getElementById('responseMessage');
@@ -92,18 +99,18 @@ onMounted(() => {
                         accept=".png, .jpg, .jpeg" 
                         help="Select a photo that would be used as profile picture."
                         multiple="true"
-                        validation="required"
                         @change="handleFileChange" 
                         :classes="{
                             outer: 'lg:grow',
                             wrapper: 'lg:contents'
                         }"/>
                 </div>
-
+                
+                <p class="text-red-600" id="noImage" hidden>No image selected.</p>
                 <div class="lg:flex lg:justify-center">
                     <p class="my-8 lg:mx-4 mt-8 pr-0">Image preview: </p>
                     <div class="my-auto">
-                        <img v-if="imageUrl && image.length != 0"
+                        <img v-if="imageUrl"
                             :src="imageUrl" 
                             alt="Uploaded Image"
                             style="border: 1px solid #555; border-radius: 50%; width: 50px; height: 50px;" />

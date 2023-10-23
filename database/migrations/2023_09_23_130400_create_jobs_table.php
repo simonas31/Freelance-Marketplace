@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('description');
             $table->text('work_fields');
+            $table->string('job_title', 100);
             $table->float('pay_amount')->default(0);
             $table->dateTime('posted_time');
             $table->integer('user_id');

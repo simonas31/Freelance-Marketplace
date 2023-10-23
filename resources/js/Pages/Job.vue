@@ -5,25 +5,23 @@ defineProps({job: Object});
 <template>
     <Layout>
         <div class="flex-wrap content-center bg-white my-10">
-            <div class="grid">
-                {{ job }}
-                
+            <div class="grid">             
                 <div class="container mx-auto">
                     <p class="mb-6 text-lg text-center font-extrabold text-black">
-                        Jobs's information
+                        Job's information
                     </p>
                     <p class="mb-6 text-lg text-center font-normal text-gray-500">
-                       Posted time: {{ new Date((Date.parse(job?.posted_time))).toLocaleDateString('en-us', { year:"numeric", month:"numeric", day:"numeric" }) }}
+                       Posted time: {{ job?.posted_time.split(' ')[0] }}
                     </p>
                     <div class="grid grid-cols-3 mb-10">
                         <div class="mx-auto">
-                            <div class="text-lg text-center font-extrabold text-black">Country</div>
-                            <p>maybe add job country?</p>
+                            <div class="text-lg text-center font-extrabold text-black">Hiring client</div>
+                            <p>{{ job.user.name + " " + job.user.surname }}</p>
                         </div>
                         
                         <div class="mx-auto">
                             <div class="text-lg text-center font-extrabold text-black">Work fields</div>
-                            <p>{{ JSON.parse(job?.work_fields).toString() }}</p>
+                            <p>{{ job?.work_fields }}</p>
                         </div>
 
                         <div class="mx-auto">
@@ -32,10 +30,6 @@ defineProps({job: Object});
                         </div>
                     </div>
 
-                    <div class="mb-5">
-                        <p class="text-lg font-extrabold text-black">Client</p>
-                        <p>{{ job.user.name + " " + job.user.surname }}</p>
-                    </div>
                     <div class="mb-5">
                         <p class="text-lg font-extrabold text-black">Description</p>
                         <p>{{ job?.description }}</p>

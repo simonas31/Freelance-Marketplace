@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\Message as EventsMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Validator;
 
 class MessagesController extends Controller
@@ -37,12 +39,12 @@ class MessagesController extends Controller
         if(Chat::find($chat_id)?->get() == null)
             return response()->json('Could not find user chat', 404);
         
-        //return response()->json($request->all());
+        event(new EventsMessage($user_id, $chat_id, $request->input('text')));
         Message::create([
-            'user_id' => $user_id,
+            'sender' => $user_id,
             'chat_id' => $chat_id,
             'text' => $request->input('text'),
-            'send_time' => now()
+            'send_time' => Date::now()
         ]);
 
         return response()->json(['Message created successfully']);
@@ -90,7 +92,7 @@ class MessagesController extends Controller
             
         $message = Message::where([
             'id' => $message_id,
-            'user_id' => $user_id,
+            'sender' => $user_id,
             'chat_id' => $chat_id
         ])?->first();
 
@@ -128,14 +130,20 @@ class MessagesController extends Controller
         if(User::find($user_id)?->first() == null)
             return response()->json('User doesnt exist', 404);
         
-        if(Chat::where('user_id', $user_id)?->first() == null)
+        $chat = Chat::find($chat_id)?->first();
+        if($chat == null)
             return response()->json('User does not have any chats', 404);
 
-        $messages = Message::where('chat_id', $chat_id)->get()->toArray();
+        $messages = Message::where([
+            ['chat_id', '=', $chat_id]
+        ])->orderBy('send_time', 'asc')->get()->toArray();
 
-        if(empty($messages))
-            return response()->json('User does not have any messages', 404);
-
-        return response()->json($messages);
+        if(count($messages) > 0)
+        {
+            $response = ['messages' => $messages];
+        }else{
+            $response = ['chat_id' => $chat->id];
+        }
+        return response()->json($response);
     }
 }

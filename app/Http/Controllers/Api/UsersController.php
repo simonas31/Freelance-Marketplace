@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\DTO\UsersDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\Message;
 use App\Models\Portfolio;
 use App\Models\Profile;
 use App\Models\Rating;
@@ -45,12 +46,15 @@ class UsersController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
-            'username' => 'required|max:255|unique:users',
+            'username' => 'required|max:255',
             'password' => 'required|string|min:6',
         ]);
 
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
+
+        if(User::where('username', '=', $request->username)->first() != null)
+            return response()->json(['message' => 'Username already exists'], 400);
 
         if ($request->hasFile('picture')) {
             $image = file_get_contents($request->file('picture'));
@@ -94,7 +98,7 @@ class UsersController extends Controller
     {
         $user = User::find($user_id);
 
-        if($user == null)
+        if ($user == null)
             return response()->json(['Could not find specific user.'], 404);
 
         return response()->json($user);
@@ -120,7 +124,10 @@ class UsersController extends Controller
     }
 
     public function freelancers(Request $request)
-    {        
+    {
+        $newToken = auth()->refresh();
+        $cookie = cookie('jwt', $newToken, 60); // 1 hour
+
         $data = $request->all();
 
         $query = User::where('role', 2)
@@ -139,11 +146,11 @@ class UsersController extends Controller
             'portfolios.work_experience'
         );
 
-        if($data == null){
-            return response()->json($query->get());
+        if ($data == null) {
+            return response()->json($query->get())->withCookie($cookie);
         }
-        
-        if(isset($data['selectedWorkFields']) && $data['selectedWorkFields'] != null){
+
+        if (isset($data['selectedWorkFields']) && $data['selectedWorkFields'] != null) {
             $searchValues = $data['selectedWorkFields'];
             $query->where(function ($query) use ($searchValues) {
                 foreach ($searchValues as $key => $value) {
@@ -152,20 +159,20 @@ class UsersController extends Controller
             });
         }
 
-        if(isset($data['selectedExperience']) && $data['selectedExperience'] != null){
+        if (isset($data['selectedExperience']) && $data['selectedExperience'] != null) {
             $query->where('portfolios.work_experience', '=', $data['selectedExperience']);
         }
-        
+
         $results = $query->get();
 
-        return response()->json($results);
+        return response()->json($results)->withCookie($cookie);
     }
 
-    public function updateRating($user_id){
+    public function updateRating($user_id)
+    {
         $avg_rating = Rating::where('client_id', $user_id)?->avg('rating');
 
-        if($avg_rating != null)
-        {
+        if ($avg_rating != null) {
             $user = User::find($user_id)->first();
             $user->rating = $avg_rating;
             $user->save();
@@ -174,12 +181,26 @@ class UsersController extends Controller
         return response()->json(['Could not find user or user is not rated'], 400);
     }
 
-    public function listUsers(){
+    public function listUsers()
+    {
         return response()->json(User::all());
     }
 
-    public function delete($user_id){
-        if(User::find($user_id)?->delete()){
+    public function delete($user_id)
+    {
+        $user = User::find($user_id);
+
+        if ($user != null) {
+            $user->profile()->delete();
+            $user->portfolio()->delete();
+            $chat = Chat::where('user_id', '=', 4)->orWhere('receiver', '=', 4)->first();
+            if ($chat != null) {
+                Message::find($chat->id)?->delete();
+                $chat->delete();
+            }
+            $user->rating()->delete();
+            $user->delete();
+
             return response()->json(['deleted successfully']);
         } else {
             return response()->json(['could not delete user'], 400);

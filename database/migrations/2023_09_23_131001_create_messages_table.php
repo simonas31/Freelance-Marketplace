@@ -13,11 +13,10 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
+            $table->integer('sender');
             $table->integer('chat_id');
             $table->text('text');
             $table->dateTime('send_time');
-            $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('chat_id')->references('id')->on('chats');
         });
     }

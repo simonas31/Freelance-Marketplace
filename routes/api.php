@@ -48,6 +48,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::post('ratings', [RatingsController::class, 'store']);
     Route::get('ratings/{freelancer_id}', [RatingsController::class, 'show']);
     Route::put('ratings/{freelancer_id}', [RatingsController::class, 'update']);
+    Route::get('ratings/{freelancer_id}/{client_id}', [RatingsController::class, 'clientFreelancerRating']);
     Route::delete('ratings/{rating_id}', [RatingsController::class, 'destroy']);
 
     //hierachical connection
@@ -57,7 +58,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::put('users/{user_id}', [UsersController::class, 'updateRating']);
 
     Route::get('users/{user_id}/chats', [ChatsController::class, 'listUserChats']);
-    Route::post('users/{user_id}/chats', [ChatsController::class, 'store']);
+    Route::post('users/{user_id}/{receiver}/chats', [ChatsController::class, 'store']);
     Route::put('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'update']);
     Route::delete('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'destroy']);
     Route::get('users/{user_id}/chats/{chat_id}', [ChatsController::class, 'UserChat']);

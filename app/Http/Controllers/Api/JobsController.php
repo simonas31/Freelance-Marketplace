@@ -15,12 +15,16 @@ class JobsController extends Controller
      */
     public function index(Request $request)
     {
+        $newToken = auth()->refresh();
+        $cookie = cookie('jwt', $newToken, 60); // 1 hour
+
         $data = $request->all();
         $query = Job::with(['user' => function ($query) {
             $query->select('id', 'name', 'surname');
         }]);
+
         if($data == null){
-            return $query->get();
+            return response()->json($query->get())->withCookie($cookie);
         }
         
         if(isset($data['payFrom'])){
@@ -42,7 +46,7 @@ class JobsController extends Controller
 
         $results = $query->get();
 
-        return response()->json($results);
+        return response()->json($results)->withCookie($cookie);
     }
 
     /**
@@ -54,6 +58,7 @@ class JobsController extends Controller
             'description' => 'required|string',
             'work_fields' => 'required|string',
             'pay_amount' => 'required|integer',
+            'job_title' => 'required|string'
         ]);
 
         if ($validator->fails())
@@ -63,6 +68,7 @@ class JobsController extends Controller
             'description' => $request->input('description'),
             'work_fields' => $request->input('work_fields'),
             'pay_amount' => $request->input('pay_amount'),
+            'job_title' => $request->input('job_title'),
             'posted_time' => now(),
             'user_id' => $user_id,
         ]);

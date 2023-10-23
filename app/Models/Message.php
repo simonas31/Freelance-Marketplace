@@ -10,13 +10,13 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['text', 'chat_id', 'user_id', 'send_time'];
+    protected $fillable = ['text', 'chat_id', 'sender', 'send_time'];
 
     public $timestamps = false;
 
     public function chat(): HasOne
     {
-        return $this->hasOne(Chat::class, 'sender');
+        return $this->hasOne(Chat::class, 'user_id');
     }
 
     public function user(): HasOne

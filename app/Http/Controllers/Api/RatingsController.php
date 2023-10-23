@@ -32,6 +32,18 @@ class RatingsController extends Controller
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        $found = Rating::where([
+            'client_id' => $request->input('client_id'),
+            'freelancer_id' => $request->input('freelancer_id'),
+        ])->first();
+
+        if($found != null)
+        {
+            $found->update(['rating' => $request->input('rating')]);
+            $found->save();
+            return response()->json(['Rating updated successfuly.']);
+        }
+
         Rating::create([
             'client_id' => $request->input('client_id'),
             'freelancer_id' => $request->input('freelancer_id'),
@@ -47,13 +59,9 @@ class RatingsController extends Controller
     public function show(Request $request, $freelancer_id)
     {
         //
-        $rating = Rating::where('freelancer_id', $freelancer_id)->first();
+        $avg_rating = Rating::where('freelancer_id', $freelancer_id)?->avg('rating');
 
-        if(!$rating){
-            return response()->json(['Freelancer rating not found.'], 404);
-        }
-
-        return response()->json($rating);
+        return response()->json(round($avg_rating ?? 0, 1));
     }
 
     /**
@@ -91,5 +99,15 @@ class RatingsController extends Controller
         } else {
             return response()->json(['Could not delete rating'], 400);
         }
+    }
+
+    public function clientFreelancerRating(Request $request, $freelancer_id, $client_id)
+    {
+        $rating = Rating::where([
+            'client_id' => $client_id,
+            'freelancer_id' => $freelancer_id,
+        ])->first()?->rating;
+
+        return response()->json($rating ?? 0);
     }
 }
