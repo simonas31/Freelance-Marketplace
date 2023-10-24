@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('posted_time');
             $table->integer('user_id');
             $table->integer('transaction_id')->default(-1);
+            $table->boolean('creation_confirmed')->default(0);
             $table->foreign('user_id')->references('id')->on('users');
             $table->boolean('finished')->default(0);
         });

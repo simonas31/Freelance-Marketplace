@@ -30,6 +30,15 @@ class UsersController extends Controller
         $token = JWTAuth::attempt($credentials);
 
         if ($token) {
+            if(User::where([
+                ['username', '=', $request->input('username')],
+                ['confirmed_registration', '=', 1]
+            ])->first() == null){
+                return response()->json([
+                    "status" => false,
+                    "message" => "Wait for admin to confirm you account."
+                ], 401);
+            }
             return $this->respondWithToken($token, 'User logged in succcessfully');
         }
 
@@ -205,6 +214,13 @@ class UsersController extends Controller
         } else {
             return response()->json(['could not delete user'], 400);
         }
+    }
+
+    public function confirmUser($user_id)
+    {
+        User::where('id', $user_id)->update(['confirmed_registration' => 1]);
+
+        return response()->json(['message'=> 'Successfully approved user!']);
     }
 
     public function logout()

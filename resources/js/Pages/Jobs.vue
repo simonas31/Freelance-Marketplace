@@ -52,7 +52,6 @@ const fetchFiltered = async() => {
                 isLoading.value = false;
             }).catch(e => {
                 isLoading.value = false;
-                console.log(e);
             });
 
         }
@@ -64,6 +63,13 @@ const reset = async () => {
 
             jobs.value = await response.data;
         }
+
+const approve = (job_id) => {
+    axios.patch(`/api/jobs/${job_id}`)
+    .then(response => {
+        router.get('/jobs');
+    })
+}
 
 onMounted(() => {
     fetchJobs();
@@ -122,7 +128,7 @@ onMounted(() => {
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Pay</th>
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Post Time</th>
-                                <th v-if="role == CLIENT || role == ADMIN" class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Operations</th>
+                                <th v-if="role == FREELANCER" class="px-6 py-3 bg-gray-200 text-center text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Operations</th>
                             </tr>
                         </thead>
                         <tbody v-if="isLoading">
@@ -139,11 +145,11 @@ onMounted(() => {
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.pay_amount }}€</td>
                                 <td class="px-6 py-4 break-words max-w-md whitespace-no-wrap border-b border-gray-200">{{ job.description }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.posted_time }}</td>
-                                <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                    <button
-                                        @click.stop="hire(freelancer.id)"
+                                <td v-if="role == FREELANCER" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center">
+                                    <button 
+                                        @click.stop="hire(job.id)"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
-                                        Hire
+                                        Apply
                                     </button>
                                 </td>
                             </tr>

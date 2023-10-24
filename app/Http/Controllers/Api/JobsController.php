@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\HiredFreelancer;
 use App\Models\Job;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -44,7 +45,7 @@ class JobsController extends Controller
             });
         }
 
-        $results = $query->get();
+        $results = $query->where('creation_confirmed', '=', 1)->get();
 
         return response()->json($results)->withCookie($cookie);
     }
@@ -129,6 +130,8 @@ class JobsController extends Controller
         if(empty($job))
             return response()->json('Could not find user job');
 
+        HiredFreelancer::where('client_id', $user_id)?->delete();
+
         if ($job?->delete()) {
             return response()->json(['deleted successfully']);
         } else {
@@ -162,5 +165,12 @@ class JobsController extends Controller
             return response()->json('User does not have any jobs', 404);
 
         return response()->json($chats);
+    }
+
+    public function confirmCreation($job_id)
+    {
+        Job::where('id', $job_id)->update(['creation_confirmed' => 1]);
+
+        return response()->json(['message' => 'Job creation confirmed.']);
     }
 }

@@ -72,9 +72,13 @@ class UsersController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(User $user)
+    public function usersToConfirm()
     {
-        //
+        $users = User::all()->toArray();
+
+        return Inertia::render('Users',[
+            'users' => $users
+        ]);
     }
 
     /**

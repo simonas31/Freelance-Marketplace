@@ -7,6 +7,13 @@ const store = useStore();
 const user = computed(() => store.state.user);
 const role = computed(() => user.value.role);
 
+const remove = (job_id) => {
+    axios.delete(`api/users/${user.value.id}/jobs/${job_id}`)
+    .then(response => {
+        router.get('/your-jobs');
+    });
+};
+
 </script>
 <template>
     <Layout>
@@ -33,14 +40,9 @@ const role = computed(() => user.value.role);
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.work_fields }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.pay_amount }} €</td>
                                 <!-- add - remove button for each freelancer by admin -->
-                                <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center">
                                     <button v-if="role == CLIENT || role == ADMIN"
-                                        @click.stop="edit()"
-                                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
-                                        Edit
-                                    </button>
-                                    <button v-if="role == CLIENT || role == ADMIN"
-                                        @click.stop="remove(freelancer.id)"
+                                        @click.stop="remove(job.id)"
                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                         Remove
                                     </button>
@@ -59,12 +61,16 @@ import { defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
 import { router } from '@inertiajs/vue3';
+import axios from 'axios';
 
 export default {
     components: { Layout },
     methods: {
         find(id){
             router.get('jobs/' + id);
+        },
+        edit(id){
+            router.get('edit-jobs/' + id);
         }
     },
     title: 'Your jobs',

@@ -7,14 +7,14 @@ const auth = computed(() => store.state.authenticated);
 const user = computed(() => store.state.user);
 
 const links = computed(() => {
-    const links = [{ name: "Home", href: "/" }];
+    const links = [];
     if (auth.value) {
         if (user.value.role == FREELANCER) {
             links.push({ name: "Jobs", href: "/jobs" });
         } else if (user.value.role == CLIENT) {
-            links.push({ name: "Available freelancers", href: "/freelancers" });
+            links.push({ name: "Available Freelancers", href: "/freelancers" }, { name: 'Hired Freelancers', href: '/hired-freelancers' });
         } else if (user.value.role == ADMIN) {
-            links.push({ name: "Jobs", href: "/jobs" }, { name: "Clients", href: "/clients" });
+            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" }, { name: "Freelancers", href: "/freelancers"});
         }
     }
     return links;
@@ -49,7 +49,7 @@ const links = computed(() => {
                 <div class="hidden lg:flex" v-cloak v-if="auth">
                     <Dropdown></Dropdown>
                 </div>
-                <Sidebar :isVisible="isHidden" @toggle-sidebar="toggleSidebar()" />
+                <Sidebar :isVisible="isHidden" @toggle-sidebar="toggleSidebar()" :links="links" />
             </div>
         </div>
     </nav>

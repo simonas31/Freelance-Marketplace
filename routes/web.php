@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfilesController;
 use App\Http\Controllers\UsersController;
 use App\Models\Chat;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +21,9 @@ use Inertia\Inertia;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::get('/test', function(){
+    return [now(), Date::now()];
+});
 Route::get('/', function () {
     return Inertia::render('Index');
 });
@@ -30,6 +34,8 @@ Route::middleware(['jwt', 'guest'])->group(function () {
     Route::get("register-freelancer", [UsersController::class, "registerFreelancer"]);
 });
 
+//idet auth kiekvienam puslapiui kur admin tik admin, kur client tik client
+
 Route::middleware(['auth'])->group(function () {
     Route::get('jobs', [JobsController::class, 'index']);
     Route::get('jobs/{id}', [JobsController:: class, 'find']);
@@ -39,6 +45,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('portfolio', [PortfoliosController::class, 'index']);
     Route::get('create-job', [JobsController::class, 'create']);
     Route::get('your-jobs', [JobsController::class, 'userJobs']);
+    Route::get('users', [UsersController::class, 'usersToConfirm']);
+    Route::geT('confirm-jobs', [JobsController::class, 'confirmJobs']);
 });
 
 Route::get('{slug}', function () {

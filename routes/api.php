@@ -55,6 +55,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::get('users', [UsersController::class, 'listUsers']);
     Route::get('users/{user_id}', [UsersController::class, 'specificUser']);
     Route::delete('users/{user_id}', [UsersController::class, 'delete']);
+    Route::patch('users/{user_id}', [UsersController::class, 'confirmUser']);
     Route::put('users/{user_id}', [UsersController::class, 'updateRating']);
 
     Route::get('users/{user_id}/chats', [ChatsController::class, 'listUserChats']);
@@ -70,6 +71,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::get('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'UserChatMessage']);
 
     Route::get('jobs', [JobsController::class, 'index']);
+    Route::patch('jobs/{job_id}', [JobsController::class, 'confirmCreation']);
     Route::get('users/{user_id}/jobs', [JobsController::class, 'listUserJobs']);
     Route::post('users/{user_id}/jobs', [JobsController::class, 'store']);
     Route::put('users/{user_id}/jobs/{job_id}', [JobsController::class, 'update']);

@@ -34,4 +34,15 @@ class JobsController extends Controller
             'jobs' => $jobs
         ]);
     }
+
+    public function confirmJobs()
+    {
+        $jobs = Job::with(['user' => function ($query) {
+            $query->select('id', 'name', 'surname');
+        }])->where('creation_confirmed', 0)->get()->toArray();
+        
+        return Inertia::render('ConfirmJobs', [
+            'jobs' => $jobs
+        ]);
+    }
 }

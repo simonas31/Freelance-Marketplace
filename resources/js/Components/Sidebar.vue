@@ -1,7 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-import { onClickOutside } from '@vueuse/core'
+import { ref } from 'vue';
+import { onClickOutside } from '@vueuse/core';
 import { Link } from '@inertiajs/vue3';
+import { defineProps } from 'vue';
+
+const { isVisible, links } = defineProps(['isVisible', 'links']);
 
 const isHidden = ref(false)
 const isHiddenRef = ref(null)
@@ -37,8 +40,8 @@ onClickOutside(isHiddenRef, (event) => { isHidden.value = true; })
                         </li>
                     </ul>
                 </div>
-
-                <div class="mt-auto">
+                {{ user }}
+                <div v-if="user?.value != null" class="mt-auto">
                     <div class="pt-6" @click="toggleSidebarSignal()">
                         <Link href="/login" class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-blue-400 rounded-xl">Login in</Link>
                     </div>
@@ -49,17 +52,6 @@ onClickOutside(isHiddenRef, (event) => { isHidden.value = true; })
 </template>
 <script>
 export default {
-    props: ['isVisible'],
-    data() {
-        return {
-            links: [],
-        }
-    },
-    mounted() {
-        this.links = [
-            { name: "Home", href: "/" },
-        ]
-    },
     methods: {
         toggleSidebarSignal() {
             this.$emit('toggleSidebar');
