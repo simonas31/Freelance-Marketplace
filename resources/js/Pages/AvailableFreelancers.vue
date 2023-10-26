@@ -54,12 +54,10 @@ const fetchFiltered = async() => {
         },
         params: params
     }).then((response) => {
-        console.log(response.data);
         freelancers.value = response.data;
         isLoading.value = false;
     }).catch(e => {
         isLoading.value = false;
-        console.log(e);
     });
 }
 

@@ -3,7 +3,7 @@ import Echo from "laravel-echo";
 import Pusher from 'pusher-js';
 
 window.Pusher = Pusher;
- 
+
 window.Echo = new Echo({
     broadcaster: 'pusher',
     key: import.meta.env.VITE_PUSHER_APP_KEY,
@@ -16,6 +16,5 @@ axios.defaults.withCredentials = true;
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 window.axios.defaults.headers.common["Content-Type"] = "application/json";
-//window.axios.defaults.baseURL = "http://127.0.0.1:8000/";
-// console.log(import.meta.env.APP_URL);
-// window.axios.defaults.baseURL = import.meta.env.APP_URL;
+
+window.axios.defaults.baseURL = import.meta.env.APP_URL;

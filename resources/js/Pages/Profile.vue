@@ -55,7 +55,6 @@ const save = async (e) => {
         .catch(function (error) {
             let p = document.getElementById('responseMessage');
             p.style = 'color: red';
-            console.log(error);
             p.innerHTML = error.response.data;
     });
 }
