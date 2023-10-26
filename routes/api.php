@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\PortfoliosController;
 use App\Http\Controllers\Api\ProfilesController;
 use App\Http\Controllers\Api\RatingsController;
 use App\Http\Controllers\Api\TransactionsController;
-use App\Http\Controllers\API\UsersController;
+use App\Http\Controllers\Api\UsersController;
 use App\Models\HiredFreelancer;
 use Illuminate\Support\Facades\Route;
 
