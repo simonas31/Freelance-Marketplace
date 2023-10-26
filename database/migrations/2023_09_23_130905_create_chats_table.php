@@ -16,7 +16,6 @@ return new class extends Migration
             $table->integer('user_id');
             $table->integer('receiver');
             $table->boolean('deleted')->default(0);
-            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

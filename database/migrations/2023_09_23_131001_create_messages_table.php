@@ -17,7 +17,6 @@ return new class extends Migration
             $table->integer('chat_id');
             $table->text('text');
             $table->dateTime('send_time');
-            $table->foreign('chat_id')->references('id')->on('chats');
         });
     }
 

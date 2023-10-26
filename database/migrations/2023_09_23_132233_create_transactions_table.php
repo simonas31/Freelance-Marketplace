@@ -19,8 +19,6 @@ return new class extends Migration
             $table->integer('receiver');
             $table->integer('job_id');
             $table->boolean('completed')->default(0);
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->foreign('job_id')->references('id')->on('jobs');
             $table->timestamps();
         });
     }
