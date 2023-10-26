@@ -16,4 +16,6 @@ axios.defaults.withCredentials = true;
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 window.axios.defaults.headers.common["Content-Type"] = "application/json";
-window.axios.defaults.baseURL = "http://127.0.0.1:8000/";
+//window.axios.defaults.baseURL = "http://127.0.0.1:8000/";
+// console.log(import.meta.env.APP_URL);
+// window.axios.defaults.baseURL = import.meta.env.APP_URL;
