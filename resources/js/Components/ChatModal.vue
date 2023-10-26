@@ -73,7 +73,7 @@ watch(() => props.show_Chat, (newVal, oldVal) => {
                 <h2 class="text-lg font-semibold">Chat with {{ props.receiver[0] }}</h2>
                 <button class="text-gray-500 hover:text-red-500" @click="closeModalSignal">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg">
+                        xmlns="https://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
