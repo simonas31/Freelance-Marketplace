@@ -19,7 +19,7 @@ const fetchMessages = async () => {
             const scroll = document.getElementById('scrollToBottom');
             scroll.scrollTo({left: 0, top: scroll.scrollHeight, behavior: 'smooth'});
 
-            Pusher.logToConsole = true;//turn this of in production
+            Pusher.logToConsole = false;//turn this of in production
 
             const pusher = new Pusher('d1b16a9460bea8a34794', {
                 cluster: 'eu'
