@@ -12,4 +12,14 @@ class Chat extends Model
     public $timestamps = false;
 
     protected $fillable = ['user_id', 'receiver', 'deleted'];
+
+    public function client_receiver()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function freelancer_receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver');
+    }
 }

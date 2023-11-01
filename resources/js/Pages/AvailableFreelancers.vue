@@ -186,7 +186,7 @@ onMounted(() => {
                                     >
                                         Chat
                                     </button>
-                                    <button v-if="role == CLIENT"
+                                    <button v-if="role == ADMIN"
                                         @click.stop="remove(freelancer.id)"
                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                         Remove

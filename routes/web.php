@@ -1,12 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\PortfoliosController as ApiPortfoliosController;
+use App\Http\Controllers\ChatsController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\PortfoliosController;
 use App\Http\Controllers\ProfilesController;
 use App\Http\Controllers\UsersController;
-use App\Models\Chat;
-use App\Models\User;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -46,7 +44,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('create-job', [JobsController::class, 'create']);
     Route::get('your-jobs', [JobsController::class, 'userJobs']);
     Route::get('users', [UsersController::class, 'usersToConfirm']);
-    Route::geT('confirm-jobs', [JobsController::class, 'confirmJobs']);
+    Route::get('confirm-jobs', [JobsController::class, 'confirmJobs']);
+    Route::get('chats', [ChatsController::class, 'userChats']);
 });
 
 Route::get('{slug}', function () {

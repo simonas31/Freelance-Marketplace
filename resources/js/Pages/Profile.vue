@@ -30,22 +30,17 @@ const handleFileChange = (e) => {
 const save = async (e) => {
     let settings = { headers: { 'Content-Type': 'multipart/form-data' } };
     const formData = new FormData();
-    formData.append('_method', 'PUT');
     if(imageUrl.value != null && country.value != null && iban.value && address.value){
         document.getElementById('noImage').hidden = true;
     }else if(imageUrl.value == null){
         document.getElementById('noImage').hidden = false;
     }
 
-    formData.append('country', country.value);
-    formData.append('iban', iban.value);
-    formData.append('address', address.value);
-    formData.append('picture', imageUrl.value);
-
     await axios.post(`/api/profiles/${userID}`, {
         country: country.value,
         iban: iban.value,
         address: address.value,
+        picture: typeof image.value != "undefined" ? image.value[0].file : null
     }, settings)
         .then(function (response) {
             let p = document.getElementById('responseMessage');
