@@ -96,8 +96,6 @@ class RatingsController extends Controller
     {
         if (Rating::find($rating_id)?->delete()) {
             return response()->json(['Deleted successfully']);
-        } else {
-            return response()->json(['Could not delete rating'], 400);
         }
     }
 

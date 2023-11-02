@@ -23,8 +23,6 @@ class TransactionsController extends Controller
             return response()->json('Could not find user job', 404);
 
         $txs = Transaction::where(['user_id' => $user_id, 'job_id' => $job_id])?->get()->toArray();
-        if(empty($txs))
-            return response()->json('Could not find user job transaction', 404);
         
         return response()->json($txs);
     }
@@ -108,8 +106,6 @@ class TransactionsController extends Controller
         
         if ($tx?->delete()) {
             return response()->json(['deleted successfully']);
-        } else {
-            return response()->json(['could not delete transaction'], 404);
         }
     }
 

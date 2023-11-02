@@ -18,21 +18,13 @@ class ProfilesController extends Controller
     }
 
     /**
-     * Store a new resource.
-     */
-    public function store(Request $request)
-    {
-        
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show($user_id)
     {
         $profile = Profile::where('user_id', $user_id)->first();
 
-        if(!$profile){
+        if ($profile == null) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
@@ -60,28 +52,28 @@ class ProfilesController extends Controller
 
         $profile = Profile::where('user_id', $user_id)->first();
 
-        if($profile == null)
+        if ($profile == null)
             return response()->json(['Profile not found'], 404);
 
         if ($request->hasFile('picture')) {
             $image = file_get_contents($request->file('picture'));
 
             Profile::where('user_id', $user_id)
-            ?->update([
-                'country' => $request->input('country'),
-                'address' => $request->input('address'),
-                'iban' => $request->input('iban'),
-                'profile_picture' => $image,
-                'posted' => 1
-            ]);
+                ?->update([
+                    'country' => $request->input('country'),
+                    'address' => $request->input('address'),
+                    'iban' => $request->input('iban'),
+                    'profile_picture' => base64_encode($image),
+                    'posted' => 1
+                ]);
         } else {
             Profile::where('user_id', $user_id)
-            ?->update([
-                'country' => $request->input('country'),
-                'address' => $request->input('address'),
-                'iban' => $request->input('iban'),
-                'posted' => 1
-            ]);
+                ?->update([
+                    'country' => $request->input('country'),
+                    'address' => $request->input('address'),
+                    'iban' => $request->input('iban'),
+                    'posted' => 1
+                ]);
         }
 
         return response()->json(['Updated successfully']);
@@ -94,8 +86,6 @@ class ProfilesController extends Controller
     {
         if (Profile::find($profile_id)?->delete()) {
             return response()->json(['Deleted successfully']);
-        } else {
-            return response()->json(['Could not delete profile'], 400);
         }
     }
 }

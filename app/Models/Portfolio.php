@@ -12,6 +12,6 @@ class Portfolio extends Model
     public $timestamps = false;
     protected $fillable = ['resume', 'user_id', 'work_fields', 'posted_time'];
     public function user(){
-        return $this->hasOne(User::class, 'id');
+        return $this->hasOne(User::class, 'id', 'user_id');
     }
 }

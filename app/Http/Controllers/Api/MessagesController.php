@@ -101,8 +101,6 @@ class MessagesController extends Controller
 
         if ($message->delete()) {
             return response()->json(['deleted successfully']);
-        } else {
-            return response()->json(['could not delete message'], 400);
         }
     }
 
@@ -116,7 +114,7 @@ class MessagesController extends Controller
 
         $message = Message::where([
             'id' => $message_id,
-            'user_id' => $user_id,
+            'sender' => $user_id,
             'chat_id' => $chat_id
         ])?->first();
 

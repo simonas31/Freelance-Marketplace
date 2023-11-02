@@ -16,11 +16,11 @@ class Message extends Model
 
     public function chat(): HasOne
     {
-        return $this->hasOne(Chat::class, 'user_id');
+        return $this->hasOne(Chat::class, 'user_id', 'sender');
     }
 
     public function user(): HasOne
     {
-        return $this->hasOne(User::class, 'id');
+        return $this->hasOne(User::class, 'id', 'sender');
     }
 }

@@ -52,7 +52,7 @@ class PortfoliosController extends Controller
         //
         $profile = Portfolio::where('user_id', $user_id)->first();
         if($profile == null)
-            return response()->json(['Could not find portfolio with that user.']);
+            return response()->json(['Could not find portfolio with that user.'], 404);
         return response()->json($profile);
     }
 
@@ -71,7 +71,7 @@ class PortfoliosController extends Controller
             return response()->json(['Check if input data is filled'], 406);
 
         if( Portfolio::where('user_id', $user_id)->first() == null)
-            return response()->json(['Could not find portfolio.']);
+            return response()->json(['Could not find portfolio.'], 404);
 
         Portfolio::where('user_id', $user_id)
             ->update([
@@ -91,8 +91,6 @@ class PortfoliosController extends Controller
     {
         if (Portfolio::where('user_id', $user_id)?->delete()) {
             return response()->json(['Deleted successfully']);
-        } else {
-            return response()->json(['Could not delete portfolio'], 400);
         }
     }
 }

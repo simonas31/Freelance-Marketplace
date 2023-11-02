@@ -16,6 +16,6 @@ class Transaction extends Model
 
     public function job(): HasOne
     {
-        return $this->hasOne(Job::class);
+        return $this->hasOne(Job::class, 'id', 'job_id');
     }
 }

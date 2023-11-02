@@ -94,8 +94,7 @@ class ChatsController extends Controller
             return response()->json('could not find user', 404);
 
         $chat = Chat::find($chat_id)?->first();
-
-
+        
         if ($chat != null && $chat->deleted) {
             $chat->delete();
             Message::where('chat_id', $chat_id)->delete();

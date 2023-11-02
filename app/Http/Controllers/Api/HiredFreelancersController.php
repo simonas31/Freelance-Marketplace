@@ -66,7 +66,7 @@ class HiredFreelancersController extends Controller
         $hf = HiredFreelancer::where('id', $hired_freelancer_id)->first();
 
         if($hf == null)
-            return response()->json(['could not find hired freelancer.']);
+            return response()->json(['could not find hired freelancer.'], 404);
         
         return response()->json($hf);
     }
@@ -112,8 +112,6 @@ class HiredFreelancersController extends Controller
         
         if ($hf?->delete()) {
             return response()->json(['deleted successfully']);
-        } else {
-            return response()->json(['could not delete hired freelancer'], 400);
         }
     }
 

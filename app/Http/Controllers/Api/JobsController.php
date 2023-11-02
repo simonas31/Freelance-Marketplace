@@ -20,23 +20,21 @@ class JobsController extends Controller
         $cookie = cookie('jwt', $newToken, 60); // 1 hour
 
         $data = $request->all();
-        $query = Job::with(['user' => function ($query) {
-            $query->select('id', 'name', 'surname');
-        }]);
+        $query = Job::with('user');
 
-        if($data == null){
+        if ($data == null) {
             return response()->json($query->get())->withCookie($cookie);
         }
-        
-        if(isset($data['payFrom'])){
+
+        if (isset($data['payFrom'])) {
             $query->where('pay_amount', '>=', $data['payFrom']);
         }
 
-        if(isset($data['payTo']) && $data['payTo'] != null){
+        if (isset($data['payTo']) && $data['payTo'] != null) {
             $query->where('pay_amount', '<=', $data['payTo']);
         }
 
-        if(isset($data['selectedWorkFields']) && $data['selectedWorkFields'] != null){
+        if (isset($data['selectedWorkFields']) && $data['selectedWorkFields'] != null) {
             $searchValues = $data['selectedWorkFields'];
             $query->where(function ($query) use ($searchValues) {
                 foreach ($searchValues as $key => $value) {
@@ -84,7 +82,7 @@ class JobsController extends Controller
     {
         //
         $job = Job::where('user_id', $user_id)->first();
-        if($job == null)
+        if ($job == null)
             return response()->json(['Could not find job'], 404);
 
         return response()->json([$job]);
@@ -104,10 +102,10 @@ class JobsController extends Controller
         if ($validator->fails())
             return response()->json('Check if input data is filled', 406);
 
-        if(User::find($user_id)?->first() == null)
+        if (User::find($user_id)?->first() == null)
             return response()->json('Could not find user', 404);
 
-        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+        if (empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
             return response()->json('Could not find user job', 404);
 
         Job::where(['id' => $job_id, 'user_id' => $user_id])
@@ -123,19 +121,19 @@ class JobsController extends Controller
      */
     public function destroy($user_id, $job_id)
     {
-        if(User::find($user_id)?->first() == null)
-        return response()->json('Could not find user');
+        if (User::find($user_id)?->first() == null) {
+            return response()->json('Could not find user', 404);
+        }
 
         $job = Job::where(['id' => $job_id, 'user_id' => $user_id])?->first();
-        if(empty($job))
-            return response()->json('Could not find user job');
+        if (empty($job)) {
+            return response()->json('Could not find user job', 404);
+        }
 
         HiredFreelancer::where('client_id', $user_id)?->delete();
 
         if ($job?->delete()) {
             return response()->json(['deleted successfully']);
-        } else {
-            return response()->json(['could not delete job'], 400);
         }
     }
 
@@ -144,27 +142,28 @@ class JobsController extends Controller
         $user = User::find($user_id)?->get();
         $job = Job::find($job_id)?->get();
 
-        if($user == null)
+        if ($user == null)
             return response()->json(['Could not find user.'], 404);
-        
-        if($job == null)
+
+        if ($job == null)
             return response()->json(['Could not find user job.'], 404);
 
         return response()->json(Job::where(['user_id' => $user_id, 'id' => $job_id])?->first());
     }
 
-    public function listUserJobs($user_id){
+    public function listUserJobs($user_id)
+    {
         $user = User::find($user_id)?->first();
 
-        if($user == null)
+        if ($user == null)
             return response()->json('User doesnt exist', 404);
 
-        $chats = Job::where('user_id', $user_id)->get()->toArray();
+        $jobs = Job::where('user_id', $user_id)->get()->toArray();
 
-        if(empty($chats))
+        if (empty($jobs))
             return response()->json('User does not have any jobs', 404);
 
-        return response()->json($chats);
+        return response()->json($jobs);
     }
 
     public function confirmCreation($job_id)

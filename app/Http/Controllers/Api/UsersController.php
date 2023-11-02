@@ -62,7 +62,7 @@ class UsersController extends Controller
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
-        if(User::where('username', '=', $request->username)->first() != null)
+        if(User::where('username', $request->input('username'))->first() != null)
             return response()->json(['message' => 'Username already exists'], 400);
 
         if ($request->hasFile('picture')) {
@@ -202,7 +202,7 @@ class UsersController extends Controller
         if ($user != null) {
             $user->profile()->delete();
             $user->portfolio()->delete();
-            $chat = Chat::where('user_id', '=', 4)->orWhere('receiver', '=', 4)->first();
+            $chat = Chat::where('user_id', $user_id)->orWhere('receiver', $user_id)->first();
             if ($chat != null) {
                 Message::find($chat->id)?->delete();
                 $chat->delete();
