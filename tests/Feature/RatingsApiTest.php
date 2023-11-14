@@ -41,7 +41,7 @@ class RatingsApiTest extends TestCase
         $response = $this->withHeader('Authorization', 'Bearer '. JWT_TOKEN)->json('POST', '/api/ratings', [
             'client_id' => 1,
             'freelancer_id' => 1,
-            'rating' => 1,
+            'rating' => 5,
         ]);
 
         $response->assertStatus(200);
@@ -51,6 +51,7 @@ class RatingsApiTest extends TestCase
     {
         $response = $this->withHeader('Authorization', 'Bearer '. JWT_TOKEN)->json('GET', '/api/ratings/1');
 
+        $this->assertEquals(5.0, $response->original, "Rated freelancer rating is not as expected");
         $response->assertStatus(200);
     }
 

@@ -45,10 +45,18 @@ class PortfoliosApiTest extends TestCase
 
     public function test_show_specific_portfolio(): void
     {
-        $porfolio = Portfolio::all()->first();
-        $response = $this->withHeader('Authorization', 'Bearer ' . JWT_TOKEN)->json('GET', '/api/portfolios/' . $porfolio->user_id);
+        $portfolio = Portfolio::all()->first();
+        $response = $this->withHeader('Authorization', 'Bearer ' . JWT_TOKEN)->json('GET', '/api/portfolios/' . $portfolio->user_id);
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson(
+            ['id' => $portfolio->id,
+             'resume' => $portfolio->resume,
+             'work_fields' => $portfolio->work_fields,
+             'work_experience' => $portfolio->work_experience,
+             'posted_time' => $portfolio->posted_time,
+             'posted' => $portfolio->posted
+            ]
+        );
     }
 
     public function test_update_portfolio_fail_validation(): void

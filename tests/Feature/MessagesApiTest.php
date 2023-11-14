@@ -154,7 +154,15 @@ class MessagesApiTest extends TestCase
         $chat = Chat::all()->first();
         $response = $this->withHeader('Authorization', 'Bearer '. JWT_TOKEN)->json('GET', '/api/users/1/chats/'. $chat->id. '/messages');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson([
+            [
+                'id' => 1,
+                'sender' => 1,
+                'chat_id' => 4,
+                'text' => 'test',
+                'send_time' => now()
+            ]
+        ]);
     }
 
     public function test_list_user_chat_messages_messages_not_found(): void

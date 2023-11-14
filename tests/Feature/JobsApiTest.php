@@ -71,7 +71,12 @@ class JobsApiTest extends TestCase
     {
         $response = $this->withHeader('Authorization', 'Bearer ' . JWT_TOKEN)->json('GET', '/api/show_job/1');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson([
+            'user_id' => 1,
+            'transaction_id' => -1,
+            'creation_confirmed' => 0,
+            'finished' => 0
+        ]);
     }
 
     public function test_update_job_fail_validation(): void

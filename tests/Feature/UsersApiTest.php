@@ -92,7 +92,16 @@ class UsersApiTest extends TestCase
     {
         $response = $this->withHeader('Authorization', 'Bearer '. JWT_TOKEN)->json('GET', '/api/users/1');
 
-        $response->assertStatus(200);
+        $response->assertStatus(200)->assertJson(
+            ["id" => 1,
+            "username" => "asd1",
+            "password" => '$2y$04$Ju6LMVIpC2osscZJ4nXOCuOTAvEvwpvAIsqB9OGojYtuVjwwpHmZ6',
+            "name" => "test1",
+            "surname" => "test1",
+            "role" => 1,
+            "rating" => null,
+            "confirmed_registration" => 0]
+        );
     }
 
     public function test_get_specific_user_fail(): void
