@@ -26,6 +26,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $hidden = ['password'];
 
+    protected $usersRoles = ['client' => 1, 'freelancer' => 2, 'admin' => 200];
     /**
      * The attributes that should be cast to native types.
      *
@@ -35,6 +36,19 @@ class User extends Authenticatable implements JWTSubject
     //     'created_at' => 'datetime',
     //     'updated_at' => 'datetime'
     // ];
+
+    public function canEnterNextRoute($guards): bool
+    {
+        $enter = [];
+        foreach ($guards as $key => $guard){
+            if ($this->role == $this->usersRoles[$guard]){
+                $enter[] = true;
+            }else{
+                $enter[] = false;
+            }
+        }
+        return in_array(true, $enter);
+    }
 
     public function profile()
     {
