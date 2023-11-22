@@ -23,7 +23,7 @@ class JobsController extends Controller
         $query = Job::with('user');
 
         if ($data == null) {
-            return response()->json($query->get())->withCookie($cookie);
+            return response()->json($query->where('creation_confirmed', '=', 1)->get())->withCookie($cookie);
         }
 
         if (isset($data['payFrom'])) {

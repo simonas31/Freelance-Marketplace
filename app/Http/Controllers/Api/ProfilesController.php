@@ -32,7 +32,7 @@ class ProfilesController extends Controller
             'country' => $profile->country,
             'address' => $profile->address,
             'iban' => $profile->iban,
-            'profile_picture' => base64_encode($profile->profile_picture)
+            'profile_picture' => $profile?->profile_picture
         ]);
     }
 

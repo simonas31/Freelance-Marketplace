@@ -13,7 +13,7 @@ class Job extends Model
 
     public $timestamps = false;
 
-    protected $fillable = ['description', 'creation_confirmed', 'job_title', 'work_fields', 'pay_amount', 'posted_time', 'user_id', 'transaction_id', 'finished'];
+    protected $fillable = ['description', 'job_title', 'work_fields', 'pay_amount', 'posted_time', 'user_id', 'transaction_id', 'creation_confirmed', 'finished'];
 
     public function transaction(): HasOne
     {

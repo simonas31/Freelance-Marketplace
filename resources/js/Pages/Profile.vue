@@ -8,16 +8,32 @@ const iban = ref(null);
 const image = ref(null);
 const imageUrl = ref(null);
 
+const base64toFile = function(base64, filename, mimeType) {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+
+    for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    const blob = new Blob([bytes], { type: mimeType });
+
+    const file = new File([blob], filename, { type: mimeType });
+
+    return file;
+}
+
 const fetchProfile = () => {
     axios.get(`api/profiles/${userID}`)
         .then((response) => {
             country.value = response.data.country
             address.value = response.data.address
             iban.value = response.data.iban
-            if(response.data.profile_picture != ""){
-                document.getElementsByClassName('formkit-no-files')[0].innerHTML = 'Your image.'
-                image.value = response.data.profile_picture;
-                imageUrl.value = 'data:image/png;base64,' + response.data.profile_picture;
+            if(response.data.profile_picture != null){
+                const fileObject = base64toFile(response.data.profile_picture, 'Your image.png', 'image/png');
+                image.value = [{ name: 'Your_image.png', file: fileObject }];
+                imageUrl.value = URL.createObjectURL(fileObject);
             }
         });
 }
