@@ -1,5 +1,7 @@
 <script setup>
-const { user_id } = defineProps(['user_id']);
+const { job } = defineProps(['job']);
+
+const user_id = job.user_id;
 
 const workFields = [{ label: 'IT', value: 'IT' }, 
                     { label: 'Graphic Design', value: 'Graphic Design' }, 
@@ -11,19 +13,19 @@ const workFields = [{ label: 'IT', value: 'IT' },
                     { label: 'Illustration and Art', value: 'Illustration and Art' }];
 
 const selectedWorkFields = ref(null);
-
+selectedWorkFields.value = job.work_fields.split(',');
 const save = async (e) => {
-    await axios.post(`api/users/${user_id}/jobs`, {
+    await axios.put(`/api/users/${user_id}/update_jobs/${job.id}`, {
         description: e.workDescription,
         work_fields: selectedWorkFields.value.toString(),
         pay_amount: e.pay,
         job_title: e.jobTitle
     })
     .then(() => {
-        router.visit('/applied-freelancers');
+        router.visit('/your-jobs');
     })
     .catch((e) => {
-        
+
     });
 }
 </script>
@@ -31,7 +33,7 @@ const save = async (e) => {
     <Layout>
         <div class="container mx-auto content-center mt-5 p-5 bg-white shadow-lg sm:mx-auto">
             <div class="mx-auto">
-                <FormKit type="form" method="put" id="registration-example" submit-label="Save" @submit="save"
+                <FormKit type="form" id="registration-example" submit-label="Save" @submit="save"
                     :actions="false" #default="{ value }">
                     <p class="text-center pb-3" id="responseMessage"></p>
                     <hr class="mb-4" />
@@ -43,6 +45,7 @@ const save = async (e) => {
 
                     <div>
                         <FormKit type="text"
+                            v-model="job.job_title"
                             name="jobTitle" 
                             label="Job Title" 
                             placeholder="Job Title."
@@ -54,6 +57,7 @@ const save = async (e) => {
 
                     <div>
                         <FormKit type="textarea"
+                            v-model="job.description"
                             name="workDescription" 
                             label="Work Description" 
                             placeholder="Work Description." 
@@ -82,6 +86,7 @@ const save = async (e) => {
                         </div>
                         <div>
                             <FormKit type="number" 
+                                v-model="job.pay_amount"
                                 name="pay" 
                                 label="Pay amount"
                                 placeholder="Pay amount" 
@@ -116,6 +121,6 @@ import axios from 'axios';
 import { ref } from 'vue';
 export default {
     components: { Layout, FormKit, Multiselect },
-    title: 'Create Job'
+    title: 'Edit Job'
 }
 </script>

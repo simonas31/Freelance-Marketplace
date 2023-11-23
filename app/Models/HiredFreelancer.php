@@ -12,10 +12,10 @@ class HiredFreelancer extends Model
     
     public $timestamps = false;
 
-    protected $fillable = ['freelancer_id', 'client_id', 'job_id', 'hire_date'];
+    protected $fillable = ['freelancer_id', 'client_id', 'job_id', 'hire_date', 'confirmed'];
 
     public function freelancer()
     {
-        return $this->hasOne(User::class, 'freelancer_id');
+        return $this->belongsTo(User::class, 'freelancer_id');
     }
 }

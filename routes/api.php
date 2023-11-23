@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\ProfilesController;
 use App\Http\Controllers\Api\RatingsController;
 use App\Http\Controllers\Api\TransactionsController;
 use App\Http\Controllers\Api\UsersController;
-use App\Models\HiredFreelancer;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -74,6 +73,7 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::get('users/{user_id}/chats/{chat_id}/messages/{message_id}', [MessagesController::class, 'UserChatMessage']);
 
     Route::get('jobs', [JobsController::class, 'index']);
+    Route::put('users/{user_id}/update_jobs/{job_id}', [JobsController::class, 'updateJob']);
     Route::get('show_job/{user_id}', [JobsController::class, 'show']);
     Route::patch('jobs/{job_id}', [JobsController::class, 'confirmCreation']);
     Route::get('users/{user_id}/jobs', [JobsController::class, 'listUserJobs']);

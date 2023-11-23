@@ -12,7 +12,7 @@ const role = computed(() => user.value.role);
 
 const logout = async () => {
     try {
-        const response = await axios.get('api/logout');
+        const response = await axios.get('/api/logout');
 
         localStorage.clear();
         location.reload();

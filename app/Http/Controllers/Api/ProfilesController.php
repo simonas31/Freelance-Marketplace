@@ -28,11 +28,16 @@ class ProfilesController extends Controller
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
+        $profilePic = $profile->profile_picture ?? null;
+        if ($profilePic != null && base64_encode(base64_decode($profilePic, true)) !== $profilePic){
+            $profilePic = base64_encode($profilePic);
+        }
+        
         return response()->json([
             'country' => $profile->country,
             'address' => $profile->address,
             'iban' => $profile->iban,
-            'profile_picture' => $profile?->profile_picture
+            'profile_picture' => $profilePic
         ]);
     }
 

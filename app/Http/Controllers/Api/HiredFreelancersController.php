@@ -35,7 +35,7 @@ class HiredFreelancersController extends Controller
     public function store(Request $request, $user_id, $job_id)
     {
         $validator = Validator::make($request->all(), [
-            'freelancer_id' => 'required|integer',
+            'client_id' => 'required|integer',
         ]);
 
         if ($validator->fails())
@@ -44,12 +44,13 @@ class HiredFreelancersController extends Controller
         if(User::find($user_id)?->first() == null)
             return response()->json('Could not find user', 404);
 
-        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+        $client_id = $request->input('client_id');
+        if(empty(Job::where(['id' => $job_id, 'user_id' => $client_id])?->first()))
             return response()->json('Could not find user job', 404);
 
         HiredFreelancer::create([
-            'freelancer_id' => $request->input('freelancer_id'),
-            'client_id' => $user_id,
+            'freelancer_id' => $user_id,
+            'client_id' => $client_id,
             'job_id' => $job_id,
             'hire_date' => now()
         ]);
@@ -80,16 +81,14 @@ class HiredFreelancersController extends Controller
     {
         if(User::find($user_id)?->first() == null)
             return response()->json('Could not find user', 404);
-
-        if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
-            return response()->json('Could not find user job', 404);
         
-        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'client_id' => $user_id])?->first();
+        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'freelancer_id' => $user_id])?->first();
         if(empty($hf))
             return response()->json('Could not find user job hired freelancer.', 404);
 
         $hf->update([
-            'hire_date' => now()
+            'hire_date' => now(),
+            'confirmed' => 1
         ]);
 
         return response()->json(['updated successfully']);

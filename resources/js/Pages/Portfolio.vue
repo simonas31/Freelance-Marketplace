@@ -22,7 +22,9 @@ const fetchData = async () => {
     await axios.get(`api/portfolios/${userID}`)
             .then((response) => {
                 resume.value = response.data.resume;
-                selectedWorkFields.value = JSON.parse(response.data.work_fields);
+                if(response.data.work_fields != ""){
+                    selectedWorkFields.value = JSON.parse(response.data.work_fields);
+                }
                 selectedExperience.value = response.data.work_experience;
             })
 }

@@ -42,6 +42,12 @@ const remove = (job_id) => {
                                 <!-- add - remove button for each freelancer by admin -->
                                 <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center">
                                     <button v-if="role == CLIENT || role == ADMIN"
+                                        @click.stop="edit(job.id)"
+                                        class="bg-yellow-200 hover:bg-yellow-300 text-white font-bold py-2 px-4 rounded">
+                                        Edit
+                                    </button>
+                                    &nbsp;
+                                    <button v-if="role == CLIENT || role == ADMIN"
                                         @click.stop="remove(job.id)"
                                         class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                         Remove

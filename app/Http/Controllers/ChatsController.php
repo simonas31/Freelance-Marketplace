@@ -25,14 +25,6 @@ class ChatsController extends Controller
                 ->toArray();
         }
 
-        for ($i = 0; $i < count($chats); $i++) {
-            if($role == 1){
-                $chats[$i]['freelancer_receiver']['profile']['profile_picture'] = base64_encode($chats[$i]['freelancer_receiver']['profile']['profile_picture']);
-            }else if($role == 2){
-                $chats[$i]['client_receiver']['profile']['profile_picture'] = base64_encode($chats[$i]['client_receiver']['profile']['profile_picture']);
-            }
-        }
-
         return Inertia::render('UserChats', [
             'chats' => $chats
         ]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\DTO\UsersDTO;
 use App\Http\Controllers\Controller;
 use App\Models\Chat;
+use App\Models\HiredFreelancer;
 use App\Models\Message;
 use App\Models\Portfolio;
 use App\Models\Profile;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -92,7 +94,7 @@ class UsersController extends Controller
 
         //create profile for user
         Profile::create([
-            'profile_picture' => $image,
+            'profile_picture' => base64_encode($image),
             'user_id' => $user->id
         ]);
 
@@ -135,24 +137,30 @@ class UsersController extends Controller
     public function freelancers(Request $request)
     {
         $newToken = auth()->refresh();
+        $client_id = auth()->id();
         $cookie = cookie('jwt', $newToken, 60); // 1 hour
 
         $data = $request->all();
 
-        $query = User::where('role', 2)
-            ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
-            ->leftJoin('portfolios', 'users.id', '=', 'portfolios.user_id');
-
-        $query->where([['portfolios.posted', '=', 1], ['profiles.posted', '=', 1]]);
-
-        $query->select(
-            'users.id',
-            'users.name',
-            'users.surname',
-            'users.rating',
+        $query = DB::table('hired_freelancers')
+        ->join('users as freelancers', 'freelancers.id', '=', 'hired_freelancers.freelancer_id')
+        ->join('jobs', 'jobs.id', '=', 'hired_freelancers.job_id')
+        ->join('profiles', 'freelancers.id', '=', 'profiles.user_id')
+        ->join('portfolios', 'freelancers.id', '=', 'portfolios.user_id')
+        ->where('profiles.posted', 1)
+        ->where('portfolios.posted', 1)
+        ->where('hired_freelancers.confirmed', 0)
+        ->select(
+            'freelancers.id as freelancer_id',
+            'freelancers.name',
+            'freelancers.surname',
+            'freelancers.rating',
             'profiles.country',
             'portfolios.work_fields',
-            'portfolios.work_experience'
+            'portfolios.work_experience',
+            'jobs.id as job_id',
+            'jobs.job_title',
+            'hired_freelancers.id as hired_freelancer_id',
         );
 
         if ($data == null) {
@@ -163,7 +171,7 @@ class UsersController extends Controller
             $searchValues = $data['selectedWorkFields'];
             $query->where(function ($query) use ($searchValues) {
                 foreach ($searchValues as $key => $value) {
-                    $query->orWhereRaw("work_fields LIKE ?", ["%$value%"]);
+                    $query->orWhere("portfolios.work_fields", 'like', '%'. $value. '%');
                 }
             });
         }

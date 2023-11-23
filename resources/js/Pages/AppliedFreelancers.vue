@@ -27,7 +27,7 @@ const role = computed(() => user.value.role);
 
 const fetchFreelancers = async() => {
     try {
-        await axios.get('api/freelancers')
+        await axios.get('/api/freelancers')
         .then((response) => {
             const data = response.data;
             freelancers.value = data;
@@ -48,7 +48,7 @@ const fetchFiltered = async() => {
         selectedExperience: selectedExperience != null ? selectedExperience.value : null,
     }
     isLoading.value = true;
-    await axios.get('api/freelancers', {
+    await axios.get('/api/freelancers', {
         headers: {
             'content-type': 'application/json'
         },
@@ -66,8 +66,7 @@ const reset = async () => {
     selectedExperience.value = null;
     freelancers.value = {}
     isLoading.value = true;
-    const response = await axios.get('api/freelancers')
-    .then((response) => {
+    const response = await axios.get('/api/freelancers').then((response) => {
         isLoading.value = false
         freelancers.value = response.data;
     })
@@ -76,17 +75,10 @@ const reset = async () => {
     })
 }
 
-const remove = async (freelancerID) => {
-    await axios.delete(`api/users/${freelancerID}`)
+const hire = async (freelancerID, jobID, hired_freelancer_id) => {
+    await axios.put(`/api/users/${freelancerID}/jobs/${jobID}/hiredfreelancers/${hired_freelancer_id}`)
     .then((response) => {
-        router.get('/freelancers');
-    })
-}
-
-const hire = async (freelancerID) => {
-    await axios.post(`api/ratings/${freelancerID}`)
-    .then((response) => {
-
+        router.get('/applied-freelancers');
     })
     .catch((e) => {
 
@@ -115,7 +107,7 @@ onMounted(() => {
         <div class="flex-wrap content-center bg-white my-10">
             <div class="grid">
                 <div class="my-10">
-                    <h1 class="mb-4 text-2xl text-center font-extrabold leading-none tracking-tight text-gray-900">Current available Freelancers</h1>
+                    <h1 class="mb-4 text-2xl text-center font-extrabold leading-none tracking-tight text-gray-900">Freelancers interested in your jobs</h1>
                     <p class="mb-6 text-lg text-center font-normal text-gray-500">
                         Search freelancers by selecting your preferred criteria.
                     </p>
@@ -151,6 +143,7 @@ onMounted(() => {
                     <table class="table-auto mx-auto">
                         <thead>
                             <tr>
+                                <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Job title</th>
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Freelancer</th>
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Country</th>
                                 <th class="px-6 py-3 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Work fields</th>
@@ -167,8 +160,9 @@ onMounted(() => {
                             </tr>
                         </tbody>
                         <tbody v-for="(freelancer, index) in freelancers">
-                            <tr @click="find(freelancer.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.name + ' ' +freelancer.surname }}</td>
+                            <tr @click="find(freelancer.freelancer_id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.job_title }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.name + ' ' + freelancer.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.country }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ JSON.parse(freelancer.work_fields).toString() }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.work_experience }}</td>
@@ -176,7 +170,7 @@ onMounted(() => {
                                 <!-- add - remove button for each freelancer by admin -->
                                 <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <button v-if="role == CLIENT"
-                                        @click.stop="hire(freelancer.id)"
+                                        @click.stop="hire(freelancer.freelancer_id, freelancer.job_id, freelancer.hired_freelancer_id)"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
                                         Hire
                                     </button>
@@ -185,11 +179,6 @@ onMounted(() => {
                                         class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mr-4"
                                     >
                                         Chat
-                                    </button>
-                                    <button v-if="role == ADMIN"
-                                        @click.stop="remove(freelancer.id)"
-                                        class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                        Remove
                                     </button>
                                 </td>
                             </tr>

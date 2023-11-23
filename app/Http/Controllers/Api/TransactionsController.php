@@ -40,19 +40,25 @@ class TransactionsController extends Controller
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
+        $receiver = $request->input('receiver');
+
         if(User::find($user_id)?->first() == null)
             return response()->json('Could not find user', 404);
 
         if(empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
             return response()->json('Could not find user job', 404);
 
-        Transaction::create([
+        $transaction = Transaction::create([
             'tax' => 2,
             'amount' => $request->input('amount'),
             'user_id' => $user_id,
-            'receiver' => $request->input('receiver'),
+            'receiver' => $receiver,
             'job_id' => $job_id
         ]);
+
+        $job = Job::where(['id' => $job_id])->first();
+        $job->transaction_id = $transaction->id;
+        $job->save();
 
         return response()->json(['Transaction created successfully']);
     }

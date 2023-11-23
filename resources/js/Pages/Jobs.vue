@@ -64,8 +64,10 @@ const reset = async () => {
             jobs.value = await response.data;
         }
 
-const approve = (job_id) => {
-    axios.patch(`/api/jobs/${job_id}`)
+const apply = (job_id, client_id) => {
+    axios.post(`/api/users/${user.value.id}/jobs/${job_id}/hiredfreelancers`, {
+        client_id: client_id,
+    })
     .then(response => {
         router.get('/jobs');
     })
@@ -80,7 +82,7 @@ onMounted(() => {
         <div class="flex-wrap content-center bg-white my-10">
             <div class="grid">
                 <div class="my-10">
-                    <h1 class="mb-4 text-2xl text-center font-extrabold leading-none tracking-tight text-gray-900">Current available Jobs</h1>
+                    <h1 class="mb-4 text-2xl text-center font-extrabold leading-none tracking-tight text-gray-900">Currently available Jobs</h1>
                     <p class="mb-6 text-lg text-center font-normal text-gray-500">
                         Search jobs by selecting your preferred criteria.
                     </p>
@@ -140,14 +142,14 @@ onMounted(() => {
                         </tbody>
                         <tbody v-for="job in jobs">
                             <tr @click="find(job.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-200 hover:cursor-pointer">
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.user.name + ' ' +job.user.surname }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.user.name + ' ' + job.user.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.work_fields }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.pay_amount }}€</td>
                                 <td class="px-6 py-4 break-words max-w-md whitespace-no-wrap border-b border-gray-200">{{ job.description }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.posted_time }}</td>
                                 <td v-if="role == FREELANCER" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 text-center">
                                     <button 
-                                        @click.stop="hire(job.id)"
+                                        @click.stop="apply(job.id, job.user_id)"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
                                         Apply
                                     </button>

@@ -36,12 +36,13 @@ const closeChatModal = (chatModalId) =>{
                 </div>
                 <div class="w-full overflow-x-auto mb-10 mx-auto lg:max-w-5xl">
                     <div v-for="(chat, index) in chats" class="grid sm:grid-cols-1 md:grid-cols-2 md:gap-2 lg:grid-cols-4 lg:gap-4">
-                        <div class="group bg-white hover:bg-gray-200 shadow-2xl rounded-lg w-64 p-4 transition-all">
+                        <div class="group bg-yellow-300 hover:bg-yellow-400 shadow-2xl rounded-lg w-64 p-4 transition-all">
+                            {{ chat.client_receiver }}
                             <img :src="'data:image/png;base64,' + (chat.client_receiver ? chat.client_receiver.profile.profile_picture : chat.freelancer_receiver.profile.profile_picture)" alt="Card Image" class="w-full h-32 object-cover rounded-t-lg">
-                            <div class="p-4 text-center bg-gray-200 group-hover:bg-white">
+                            <div class="p-4 text-center bg-white">
                                 <p class="text-black">Chat with <span class="font-semibold">{{ (chat.client_receiver ? chat.client_receiver.name + " " + chat.client_receiver.surname : chat.freelancer_receiver.name + " " + chat.freelancer_receiver.surname) }}</span></p>
                             </div>
-                            <div class="p-4 rounded-b-lg text-center bg-gray-200 group-hover:bg-white">
+                            <div class="p-4 rounded-b-lg text-center bg-blue-400">
                                 <button @click="toggleChatModal(index)" class="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-full">Chat</button>
                             </div>
                         </div>

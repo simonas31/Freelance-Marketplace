@@ -20,10 +20,6 @@ use Inertia\Inertia;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/test', function () {
-    return [now(), Date::now()];
-});
 Route::get('/', function () {
     return Inertia::render('Index');
 });
@@ -37,20 +33,21 @@ Route::middleware(['jwt', 'guest'])->group(function () {
 Route::middleware(['auth', 'users:admin,client,freelancer'])->group(function () {
     Route::get('profile', [ProfilesController::class, 'index']);
     Route::get('chats', [ChatsController::class, 'userChats']);
+    Route::get('jobs/{id}', [JobsController::class, 'find']);
+    Route::get('edit-jobs/{id}', [JobsController::class, 'editJob']);
 });
 
 Route::middleware(['auth', 'users:client'])->group(function () {
-    Route::get('freelancers', [UsersController::class, 'index']);
     Route::get('freelancers/{freelancer_id}', [UsersController::class, 'find']);
     Route::get('create-job', [JobsController::class, 'create']);
     Route::get('your-jobs', [JobsController::class, 'userJobs']);
     Route::get('hired-freelancers', [HiredFreelancersController::class, 'userHiredFreelancers']);
+    Route::get('applied-freelancers', [HiredFreelancersController::class, 'appliedFreelancers']);
 });
 
 Route::middleware(['auth', 'users:freelancer'])->group(function () {
     Route::get('portfolio', [PortfoliosController::class, 'index']);
     Route::get('jobs', [JobsController::class, 'index']);
-    Route::get('jobs/{id}', [JobsController::class, 'find']);
 });
 
 Route::middleware(['auth', 'users:admin'])->group(function () {

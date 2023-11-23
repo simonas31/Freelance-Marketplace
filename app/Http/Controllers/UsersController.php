@@ -22,10 +22,11 @@ class UsersController extends Controller
 
     public function find($freelancer_id)
     {
-        $freelancer = User::where([['users.id', '=', $freelancer_id]])
+        $freelancer = User::where('users.id',  $freelancer_id)
         ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
         ->leftJoin('portfolios', 'users.id', '=', 'portfolios.user_id')
-        ->where([['portfolios.posted', '=', 1], ['profiles.posted', '=', 1]]);
+        ->where('profiles.posted', 1)
+        ->where('portfolios.posted', 1);
 
         $freelancer->select(
             'users.id',

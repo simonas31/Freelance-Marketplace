@@ -24,7 +24,7 @@ export default {
 
         onMounted(async () => {
             try {
-                const response = await axios.get('api/auth');
+                const response = await axios.get('/api/auth');
 
                 await store.dispatch('setAuth', true);
                 await store.dispatch('setUser', response.data.user);

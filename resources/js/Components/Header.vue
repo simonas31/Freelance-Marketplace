@@ -12,7 +12,8 @@ const links = computed(() => {
         if (user.value.role == FREELANCER) {
             links.push({ name: "Jobs", href: "/jobs" });
         } else if (user.value.role == CLIENT) {
-            links.push({ name: "Available Freelancers", href: "/freelancers" }, { name: 'Hired Freelancers', href: '/hired-freelancers' });
+            links.push({ name: "Applied Freelancers", href: "/applied-freelancers" },
+                    { name: 'Hired Freelancers', href: '/hired-freelancers' });
         } else if (user.value.role == ADMIN) {
             links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" }, { name: "Freelancers", href: "/freelancers"});
         }

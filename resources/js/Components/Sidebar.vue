@@ -1,14 +1,53 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { Link } from '@inertiajs/vue3';
 import { defineProps } from 'vue';
+import { CLIENT, FREELANCER, ADMIN} from '../constants'
+import { useStore } from 'vuex';
+const store = useStore();
 
-const { isVisible, links } = defineProps(['isVisible', 'links']);
+const user = computed(() => store.state.user);
+const role = computed(() => user.value.role);
+
+const { isVisible } = defineProps(['isVisible', 'links']);
+const links = computed(() => {
+    const links = [];
+    if (Object.keys(user.value).length != 0) {
+        if (user.value.role == FREELANCER) {
+            links.push({ name: "Jobs", href: "/jobs" }, { name: "Portfolio", href: "/portfolio" }, { name: "Profile", href: "/profile" }, { name: "Transactions", href: "/transactions" });
+        } else if (user.value.role == CLIENT) {
+            links.push({ name: "Applied Freelancers", href: "/applied-freelancers" },
+                    { name: 'Hired Freelancers', href: '/hired-freelancers' },
+                    { name: "Transactions", href: "/transactions" },
+                    { name: "Create Job", href: "/create-job" },
+                    { name: "Your Jobs", href: "/your-jobs" },);
+        } else if (user.value.role == ADMIN) {
+            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" }, { name: "Freelancers", href: "/freelancers"});
+        }
+        links.push({ name: "Chats", href: "/chats" });
+    }
+    return links;
+});
 
 const isHidden = ref(false)
 const isHiddenRef = ref(null)
 onClickOutside(isHiddenRef, (event) => { isHidden.value = true; })
+
+const logout = async () => {
+    try {
+        const response = await axios.get('/api/logout');
+
+        localStorage.clear();
+        location.reload();
+
+        await store.dispatch('setAuth', false);
+        await store.dispatch('setUser', {});
+    } catch (e) {
+        await store.dispatch('setAuth', false);
+        await store.dispatch('setUser', {});
+    }
+}
 </script>
 <template>
     <div id="sidebar-menu" class="relative z-50">
@@ -40,10 +79,14 @@ onClickOutside(isHiddenRef, (event) => { isHidden.value = true; })
                         </li>
                     </ul>
                 </div>
-                {{ user }}
-                <div v-if="user?.value != null" class="mt-auto">
+                <div v-if="Object.keys(user).length == 0" class="mt-auto">
                     <div class="pt-6" @click="toggleSidebarSignal()">
                         <Link href="/login" class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-blue-400 rounded-xl">Login in</Link>
+                    </div>
+                </div>
+                <div v-else class="mt-auto">
+                    <div class="pt-6" @click="toggleSidebarSignal()">
+                        <a @click="logout" class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-blue-400 rounded-xl">Logout</a>
                     </div>
                 </div>
             </nav>

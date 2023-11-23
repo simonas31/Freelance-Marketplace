@@ -17,13 +17,23 @@ class JobsController extends Controller
     public function index(Request $request)
     {
         $newToken = auth()->refresh();
+        $user_id = auth()->id();
         $cookie = cookie('jwt', $newToken, 60); // 1 hour
 
         $data = $request->all();
         $query = Job::with('user');
 
+        $hfs = HiredFreelancer::where([
+            ['freelancer_id', '=', $user_id]
+        ])->select('job_id')->get()->toArray();
+        $temp = [];
+
+        foreach ($hfs as $key => $hf) {
+            array_push($temp, $hf['job_id']);
+        }
+
         if ($data == null) {
-            return response()->json($query->where('creation_confirmed', '=', 1)->get())->withCookie($cookie);
+            return response()->json($query->where([['creation_confirmed', '=', 1]])->whereNotIn('id', $temp)->get())->withCookie($cookie);
         }
 
         if (isset($data['payFrom'])) {
@@ -90,15 +100,34 @@ class JobsController extends Controller
 
     // ADD NEW UPDATE FUNCTION SO THAT WHEN USER GETS ASSIGNED TO TO JOB, JOB UPDATES.
 
+    public function updateJob(Request $request, $user_id, $job_id)
+    {
+        if (User::find($user_id)?->first() == null)
+        return response()->json('Could not find user', 404);
+
+        if (empty(Job::where(['id' => $job_id, 'user_id' => $user_id])?->first()))
+            return response()->json('Could not find user job', 404);
+
+        Job::where(['id' => $job_id, 'user_id' => $user_id])
+            ->update([
+                'description' => $request->input('description'),
+                'work_fields' => $request->input('work_fields'),
+                'pay_amount' => $request->input('pay_amount'),
+                'job_title' => $request->input('job_title'),
+            ]);
+
+        return response()->json(['updated successfully']);
+    }
+
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, $user_id, $job_id)
     {
+        dd('gelp');
         $validator = Validator::make($request->all(), [
             'transaction_id' => 'required|integer',
         ]);
-
         if ($validator->fails())
             return response()->json('Check if input data is filled', 406);
 

@@ -6,7 +6,7 @@ const overallRating = ref(null);
 const hoveredStars = ref(0);
 
 const rate = async (rating) => {
-    axios.post(`api/ratings`, {
+    axios.post(`/api/ratings`, {
         client_id: client_id,
         freelancer_id: freelancer.id,
         rating: rating
@@ -31,7 +31,7 @@ const isStarHovered = (n) => {
 };
 
 const fetchOverallRating = async () => {
-    axios.get(`api/ratings/${freelancer.id}`)
+    axios.get(`/api/ratings/${freelancer.id}`)
     .then((response) => {
         overallRating.value = response.data;
     })
@@ -41,7 +41,7 @@ const fetchOverallRating = async () => {
 }
 
 const fetchUserRating = async () => {
-    axios.get(`api/ratings/${freelancer.id}/${client_id}`)
+    axios.get(`/api/ratings/${freelancer.id}/${client_id}`)
     .then((response) => {
         userRating.value = response.data;
         hoverStars(userRating.value);
@@ -101,7 +101,7 @@ onMounted(() => {
                         
                         <div class="mx-auto">
                             <div class="text-lg text-center font-extrabold text-black">Work fields</div>
-                            <p>{{ JSON.parse(freelancer?.work_fields).toString() }}</p>
+                            <p>{{ JSON.parse(freelancer?.work_fields ?? []).toString() }}</p>
                         </div>
 
                         <div class="mx-auto">

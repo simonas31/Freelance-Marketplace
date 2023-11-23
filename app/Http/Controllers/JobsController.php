@@ -45,4 +45,12 @@ class JobsController extends Controller
             'jobs' => $jobs
         ]);
     }
+
+    public function editJob($id)
+    {
+        $job = Job::find($id)->first();
+        return Inertia::render('EditJob', [
+            'job' => $job
+        ]);
+    }
 }
