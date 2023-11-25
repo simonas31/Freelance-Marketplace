@@ -5,6 +5,7 @@ use App\Http\Controllers\HiredFreelancersController;
 use App\Http\Controllers\JobsController;
 use App\Http\Controllers\PortfoliosController;
 use App\Http\Controllers\ProfilesController;
+use App\Http\Controllers\TransactionsController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
@@ -35,6 +36,10 @@ Route::middleware(['auth', 'users:admin,client,freelancer'])->group(function () 
     Route::get('chats', [ChatsController::class, 'userChats']);
     Route::get('jobs/{id}', [JobsController::class, 'find']);
     Route::get('edit-jobs/{id}', [JobsController::class, 'editJob']);
+});
+
+Route::middleware(['auth', 'users:client,freelancer'])->group(function () {
+    Route::get('transactions', [TransactionsController::class, 'index']);
 });
 
 Route::middleware(['auth', 'users:client'])->group(function () {

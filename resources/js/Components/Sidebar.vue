@@ -15,17 +15,17 @@ const links = computed(() => {
     const links = [];
     if (Object.keys(user.value).length != 0) {
         if (user.value.role == FREELANCER) {
-            links.push({ name: "Jobs", href: "/jobs" }, { name: "Portfolio", href: "/portfolio" }, { name: "Profile", href: "/profile" }, { name: "Transactions", href: "/transactions" });
+            links.push({ name: "Jobs", href: "/jobs" }, { name: "Portfolio", href: "/portfolio" }, { name: "Profile", href: "/profile" }, { name: "Completed Transactions", href: "/transactions" }, { name: "Chats", href: "/chats" });
         } else if (user.value.role == CLIENT) {
             links.push({ name: "Applied Freelancers", href: "/applied-freelancers" },
                     { name: 'Hired Freelancers', href: '/hired-freelancers' },
-                    { name: "Transactions", href: "/transactions" },
+                    { name: "Completed Transactions", href: "/transactions" },
                     { name: "Create Job", href: "/create-job" },
-                    { name: "Your Jobs", href: "/your-jobs" },);
+                    { name: "Your Jobs", href: "/your-jobs" },
+                    { name: "Chats", href: "/chats" });
         } else if (user.value.role == ADMIN) {
-            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" }, { name: "Freelancers", href: "/freelancers"});
+            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" });
         }
-        links.push({ name: "Chats", href: "/chats" });
     }
     return links;
 });

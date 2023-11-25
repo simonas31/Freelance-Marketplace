@@ -124,7 +124,6 @@ class JobsController extends Controller
      */
     public function update(Request $request, $user_id, $job_id)
     {
-        dd('gelp');
         $validator = Validator::make($request->all(), [
             'transaction_id' => 'required|integer',
         ]);

@@ -111,6 +111,7 @@ export default {
         find(id){
             router.get('freelancers/' + id);
         },
-    }
+    },
+    title: 'Hired Freelancers',
 }
 </script>

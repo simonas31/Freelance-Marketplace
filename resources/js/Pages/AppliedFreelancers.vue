@@ -212,6 +212,7 @@ export default {
         find(id){
             router.get('freelancers/' + id);
         },
-    }
+    },
+    title: 'Applied Freelancers'
 }
 </script>

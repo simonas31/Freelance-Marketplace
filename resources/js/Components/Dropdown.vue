@@ -43,7 +43,7 @@ const logout = async () => {
             <li>
                 <Link href="/profile" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Profile</Link>
                 <Link href="/chats" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Your Chats</Link>
-                <Link href="/transactions" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Transactions</Link>
+                <Link href="/transactions" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Completed Transactions</Link>
             </li>
             <li v-show="role == CLIENT">
                 <Link href="/create-job" class="block px-4 py-2 hover:bg-gray-100 hover:cursor-pointer">Create Job</Link>

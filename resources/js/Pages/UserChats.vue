@@ -76,11 +76,11 @@ export default {
         },
 
         getClientReceiverHeight(index) {
-            return this.chats[index]?.client_receiver ? this.calculateTextHeight(this.chats[index]?.client_receiver.name + " " + this.chats[index]?.client_receiver.surname) : 0;
+            return this.chats[index]?.client_receiver ? this.calculateTextHeight(this.chats[index]?.client_receiver?.name + " " + this.chats[index]?.client_receiver?.surname) : 0;
         },
 
         getFreelancerReceiverHeight(index) {
-            return this.calculateTextHeight(this.chats[index]?.freelancer_receiver.name + " " + this.chats[index]?.freelancer_receiver.surname);
+            return this.calculateTextHeight(this.chats[index]?.freelancer_receiver?.name + " " + this.chats[index]?.freelancer_receiver?.surname);
         },
 
         calculateTextHeight(text) {
