@@ -19,6 +19,7 @@ return new class extends Migration
             $table->float('pay_amount')->default(0);
             $table->dateTime('posted_time');
             $table->integer('user_id');
+            $table->integer('freelancer_id')->default(-1);
             $table->integer('transaction_id')->default(-1);
             $table->boolean('creation_confirmed')->default(0);
             $table->boolean('finished')->default(0);

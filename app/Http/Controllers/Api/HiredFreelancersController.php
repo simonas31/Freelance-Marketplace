@@ -55,6 +55,10 @@ class HiredFreelancersController extends Controller
             'hire_date' => now()
         ]);
 
+        Job::where('id', '=', $job_id)->update([
+            'freelancer_id' => $user_id
+        ]);
+
         return response()->json(['hired freelancer created successfully']);
     }
 
@@ -82,7 +86,7 @@ class HiredFreelancersController extends Controller
         if(User::find($user_id)?->first() == null)
             return response()->json('Could not find user', 404);
         
-        $hf = HiredFreelancer::where(['job_id' => $job_id, 'id' => $hired_freelancer_id, 'freelancer_id' => $user_id])?->first();
+        $hf = HiredFreelancer::where([['job_id', '=', $job_id], ['id', '=', $hired_freelancer_id], ['freelancer_id', '=', $user_id]])?->first();
         if(empty($hf))
             return response()->json('Could not find user job hired freelancer.', 404);
 

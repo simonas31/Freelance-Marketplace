@@ -18,6 +18,7 @@ const message = ref('Loading...');
 const selectedWorkFields = ref(null);
 const payFrom = ref(null);
 const payTo = ref(null);
+const showChatModals = ref([]);
 const store = useStore();
 
 const user = computed(() => store.state.user);
@@ -71,6 +72,19 @@ const apply = (job_id, client_id) => {
     .then(response => {
         router.get('/jobs');
     })
+}
+
+const toggleChatModal = (chatModalId) => {
+    if(!showChatModals[chatModalId]){
+        for(let i = 0; i < showChatModals.value.length; i++){
+            showChatModals.value[i] = false;
+        }
+        showChatModals.value[chatModalId] = true;
+    }
+};
+
+const closeChatModal = (chatModalId) =>{
+    showChatModals.value[chatModalId] = false;
 }
 
 onMounted(() => {
@@ -140,7 +154,7 @@ onMounted(() => {
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-for="job in jobs">
+                        <tbody v-for="(job, index) in jobs">
                             <tr @click="find(job.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-200 hover:cursor-pointer">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.user.name + ' ' + job.user.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ job.work_fields }}</td>
@@ -153,8 +167,21 @@ onMounted(() => {
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
                                         Apply
                                     </button>
+                                    <button
+                                        @click.stop="toggleChatModal(index)"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mr-4"
+                                    >
+                                        Chat
+                                    </button>
                                 </td>
                             </tr>
+                            <ChatModal 
+                                :freelancer_id="job.user_id"
+                                :show_Chat="showChatModals[index]"
+                                :modal-id="index"
+                                :receiver="[job.user.name, job.user.surname]"
+                                @close-chat-modal="closeChatModal(index)"
+                            ></ChatModal>
                         </tbody>
                     </table>
                 </div>
@@ -166,11 +193,12 @@ onMounted(() => {
 import Layout from '../Layout/Layout.vue';
 import { FormKit } from '@formkit/vue';
 import Multiselect from '@vueform/multiselect';
+import ChatModal from '../Components/ChatModal.vue';
 import axios from 'axios';
 import { ref, onMounted, defineProps } from 'vue';
 import { router } from '@inertiajs/vue3'
 export default {
-    components: { Layout, FormKit, Multiselect },
+    components: { Layout, FormKit, Multiselect, ChatModal },
     methods: {
         find(id){
             router.get('jobs/' + id);

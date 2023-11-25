@@ -160,17 +160,17 @@ onMounted(() => {
                             </tr>
                         </tbody>
                         <tbody v-for="(freelancer, index) in freelancers">
-                            <tr @click="find(freelancer.freelancer_id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
+                            <tr @click="find(freelancer.freelancer.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.job_title }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.name + ' ' + freelancer.surname }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.country }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ JSON.parse(freelancer.work_fields).toString() }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.work_experience }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.rating || 0 }}</td>   
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.freelancer.name + ' ' + freelancer.freelancer.surname }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.freelancer.profile.country }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ JSON.parse(freelancer.freelancer.portfolio.work_fields).toString() }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.freelancer.portfolio.work_experience }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ freelancer.freelancer.rating || 0 }}</td>   
                                 <!-- add - remove button for each freelancer by admin -->
                                 <td v-if="role == CLIENT || role == ADMIN" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <button v-if="role == CLIENT"
-                                        @click.stop="hire(freelancer.freelancer_id, freelancer.job_id, freelancer.hired_freelancer_id)"
+                                        @click.stop="hire(freelancer.freelancer.id, freelancer.job_id, freelancer.id)"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
                                         Hire
                                     </button>
@@ -183,10 +183,10 @@ onMounted(() => {
                                 </td>
                             </tr>
                             <ChatModal 
-                                :freelancer_id="freelancer.id"
+                                :freelancer_id="freelancer.freelancer.id"
                                 :show_Chat="showChatModals[index]"
                                 :modal-id="index"
-                                :receiver="[freelancer.name, freelancer.surname]"
+                                :receiver="[freelancer.freelancer.name, freelancer.freelancer.surname]"
                                 @close-chat-modal="closeChatModal(index)"
                             ></ChatModal>
                         </tbody>

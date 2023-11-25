@@ -29,13 +29,13 @@ class ChatsController extends Controller
         if($user == null)
             return response()->json('Could not find user', 404);
 
-        $chat = Chat::where([
-            'user_id' => $user_id,
-            'receiver' => $receiver
-        ])->orWhere([
-            'user_id' => $receiver,
-            'receiver' => $user_id
-        ])->first();
+        $chat = Chat::where('user_id', $user_id)
+            ->where('receiver', $receiver)
+            ->orWhere(function ($query) use ($user_id, $receiver) {
+                $query->where('user_id', $receiver)
+                    ->where('receiver', $user_id);
+            })
+            ->first();
 
         if($chat != null)
             return response()->json($chat);

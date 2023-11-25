@@ -58,6 +58,7 @@ class TransactionsController extends Controller
 
         $job = Job::where(['id' => $job_id])->first();
         $job->transaction_id = $transaction->id;
+        $job->finished = 1;
         $job->save();
 
         return response()->json(['Transaction created successfully']);

@@ -33,7 +33,7 @@ class JobsController extends Controller
         }
 
         if ($data == null) {
-            return response()->json($query->where([['creation_confirmed', '=', 1]])->whereNotIn('id', $temp)->get())->withCookie($cookie);
+            return response()->json($query->where([['creation_confirmed', '=', 1], ['finished', '=', 0], ['freelancer_id', '=', -1]])->whereNotIn('id', $temp)->get())->withCookie($cookie);
         }
 
         if (isset($data['payFrom'])) {

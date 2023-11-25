@@ -48,7 +48,7 @@ const save = async (e) => {
                             placeholder="Job Title."
                             validation="required" 
                             :classes="{
-                                wrapper: 'lg:contents'
+                                wrapper: 'sm:contents'
                             }" />
                     </div>
 
@@ -61,11 +61,11 @@ const save = async (e) => {
                             validation="required" 
                             :classes="{
                                 outer: 'lg:grow',
-                                wrapper: 'lg:contents'
+                                wrapper: 'sm:contents'
                             }" />
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid sm:grid-cols-1 lg:grid-cols-2 gap-2">
                         <div>
                             <label for="selectedWorkFields">Select your work fields:</label>
                                 <Multiselect
@@ -89,7 +89,7 @@ const save = async (e) => {
                                 :min="10"
                                 :classes="{
                                     outer: 'lg:grow',
-                                    wrapper: 'lg:contents'
+                                    wrapper: 'sm:contents'
                                 }" />
                         </div>
                     </div>

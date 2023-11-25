@@ -6,6 +6,7 @@ const store = useStore();
 
 const user = computed(() => store.state.user);
 const role = computed(() => user.value.role);
+const showChatModals = ref([]);
 
 const pay = (freelancerID, jobID, amount) => {
     axios.post(`/api/users/${user.value.id}/jobs/${jobID}/transactions`, {
@@ -16,6 +17,20 @@ const pay = (freelancerID, jobID, amount) => {
         router.get('/hired-freelancers');
     });
 }
+
+const toggleChatModal = (chatModalId) => {
+    if(!showChatModals[chatModalId]){
+        for(let i = 0; i < showChatModals.value.length; i++){
+            showChatModals.value[i] = false;
+        }
+        showChatModals.value[chatModalId] = true;
+    }
+};
+
+const closeChatModal = (chatModalId) =>{
+    showChatModals.value[chatModalId] = false;
+}
+
 
 </script>
 <template>
@@ -43,12 +58,11 @@ const pay = (freelancerID, jobID, amount) => {
                             <tr @click="find(hiredFreelancer.freelancer.id)" class="odd:bg-white even:bg-slate-50 hover:bg-slate-100 hover:cursor-pointer">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.job_title }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.freelancer.name + ' ' + hiredFreelancer.freelancer.surname }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.country }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ JSON.parse(hiredFreelancer.work_fields).toString() }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.work_experience }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.rating || 0 }}</td>   
-
-                                <td v-if="role == CLIENT" class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.freelancer.profile.country }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ JSON.parse(hiredFreelancer.freelancer.portfolio.work_fields).toString() }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.freelancer.portfolio.work_experience }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ hiredFreelancer.freelancer.rating || 0 }}</td>   
+                                <td v-if="role == CLIENT" class="text-center px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                     <button v-if="role == CLIENT && hiredFreelancer.transaction_id == -1"
                                         @click.stop="pay(hiredFreelancer.freelancer.id, hiredFreelancer.job_id, hiredFreelancer.pay_amount)"
                                         class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mr-4">
@@ -59,8 +73,21 @@ const pay = (freelancerID, jobID, amount) => {
                                             Payed
                                         </div>
                                     </div>
+                                    <button
+                                        @click.stop="toggleChatModal(index)"
+                                        class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded mr-4"
+                                    >
+                                        Chat
+                                    </button>
                                 </td>
                             </tr>
+                            <ChatModal
+                                :freelancer_id="hiredFreelancer.freelancer.id"
+                                :show_Chat="showChatModals[index]"
+                                :modal-id="index"
+                                :receiver="[hiredFreelancer.freelancer.name, hiredFreelancer.freelancer.surname]"
+                                @close-chat-modal="closeChatModal(index)"
+                            ></ChatModal>
                         </tbody>
                     </table>
                 </div>
@@ -72,13 +99,14 @@ const pay = (freelancerID, jobID, amount) => {
 import Layout from '../Layout/Layout.vue';
 import { FormKit } from '@formkit/vue';
 import Multiselect from '@vueform/multiselect';
-import { computed, defineProps } from 'vue';
+import { computed, defineProps, ref } from 'vue';
 import { useStore } from 'vuex';
 import axios from 'axios';
 import { router } from '@inertiajs/vue3';
+import ChatModal from '../Components/ChatModal.vue';
 
 export default {
-    components: { Layout, FormKit, Multiselect },
+    components: { Layout, FormKit, Multiselect, ChatModal },
     methods: {
         find(id){
             router.get('freelancers/' + id);

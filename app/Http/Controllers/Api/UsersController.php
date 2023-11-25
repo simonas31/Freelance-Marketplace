@@ -142,32 +142,25 @@ class UsersController extends Controller
 
         $data = $request->all();
 
-        $query = DB::table('hired_freelancers')
-        ->join('users as freelancers', 'freelancers.id', '=', 'hired_freelancers.freelancer_id')
-        ->join('jobs', 'jobs.id', '=', 'hired_freelancers.job_id')
-        ->join('profiles', 'freelancers.id', '=', 'profiles.user_id')
-        ->join('portfolios', 'freelancers.id', '=', 'portfolios.user_id')
-        ->where('profiles.posted', 1)
-        ->where('portfolios.posted', 1)
-        ->where('hired_freelancers.confirmed', 0)
-        ->select(
-            'freelancers.id as freelancer_id',
-            'freelancers.name',
-            'freelancers.surname',
-            'freelancers.rating',
-            'profiles.country',
-            'portfolios.work_fields',
-            'portfolios.work_experience',
-            'jobs.id as job_id',
-            'jobs.job_title',
-            'hired_freelancers.id as hired_freelancer_id',
-        );
+        $query = HiredFreelancer::with(['freelancer.profile', 'freelancer.portfolio', 'freelancer.ratings'])
+        ->leftJoin('jobs', 'hired_freelancers.job_id', '=', 'jobs.id')
+        ->select('hired_freelancers.*', 'jobs.id as job_id', 'jobs.job_title as job_title')
+        ->where('confirmed', '=', 0);
 
         if ($data == null) {
-            return response()->json($query->get())->withCookie($cookie);
+            $temp = $query->get()->toArray();
+            foreach ($temp as &$freelancer) {
+                if (count($freelancer['freelancer']['ratings']) > 0) {
+                    $averageRating = $this->avgRating($freelancer['freelancer']['ratings']);
+                    $freelancer['freelancer']['rating'] = $averageRating;
+                } else {
+                    $freelancer['freelancer']['rating'] = null;
+                }
+            }
+            return response()->json($temp)->withCookie($cookie);
         }
 
-        if (isset($data['selectedWorkFields']) && $data['selectedWorkFields'] != null) {
+        if (isset($data['freelancer.portfolio.selectedWorkFields']) && $data['selectedWorkFields'] != null) {
             $searchValues = $data['selectedWorkFields'];
             $query->where(function ($query) use ($searchValues) {
                 foreach ($searchValues as $key => $value) {
@@ -180,9 +173,25 @@ class UsersController extends Controller
             $query->where('portfolios.work_experience', '=', $data['selectedExperience']);
         }
 
-        $results = $query->get();
+        $temp = $query->get()->toArray();
+        foreach ($temp as &$freelancer) {
+            if (count($freelancer['freelancer']['ratings']) > 0) {
+                $averageRating = $this->avgRating($freelancer['freelancer']['ratings']);
+                $freelancer['freelancer']['rating'] = $averageRating;
+            } else {
+                $freelancer['freelancer']['rating'] = null;
+            }
+        }
+        return response()->json($temp)->withCookie($cookie);
+    }
 
-        return response()->json($results)->withCookie($cookie);
+    public function avgRating($ratings)
+    {
+        $sum = 0;
+        foreach ($ratings as $rating){
+            $sum += $rating['rating'];
+        }
+        return $sum / count($ratings);
     }
 
     public function updateRating($user_id)
