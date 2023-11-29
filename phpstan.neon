@@ -1,0 +1,10 @@
+parameters:
+  level: 2
+  paths:
+    - app\Http\Controllers\Api
+
+services:
+  -
+    class: App\Rules\ControllerNamingRule
+    tags:
+      - phpstan.rules.rule

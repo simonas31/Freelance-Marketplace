@@ -31,5 +31,4 @@ export default defineConfig({
     // server: {
     //     host: true
     // }
-    // add this: "dev": "vite --host=192.168.0.109", to package.json
 });
