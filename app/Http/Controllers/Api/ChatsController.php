@@ -96,8 +96,8 @@ class ChatsController extends Controller
         $chat = Chat::find($chat_id)?->first();
         
         if ($chat != null && $chat->deleted) {
-            $chat->delete();
             Message::where('chat_id', $chat_id)->delete();
+            $chat->delete();
             
             return response()->json(['deleted successfully']);
         } else {

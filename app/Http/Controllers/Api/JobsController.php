@@ -158,7 +158,7 @@ class JobsController extends Controller
             return response()->json('Could not find user job', 404);
         }
 
-        HiredFreelancer::where('client_id', $user_id)?->delete();
+        HiredFreelancer::where('job_id', $job_id)?->delete();
 
         if ($job?->delete()) {
             return response()->json(['deleted successfully']);

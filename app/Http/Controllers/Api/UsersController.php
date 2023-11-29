@@ -224,7 +224,8 @@ class UsersController extends Controller
                 Message::find($chat->id)?->delete();
                 $chat->delete();
             }
-            $user->rating()->delete();
+            HiredFreelancer::where('freelancer_id', $user_id)->orWhere('client_id', $user_id)->delete();
+            $user->ratings()->delete();
             $user->delete();
 
             return response()->json(['deleted successfully']);

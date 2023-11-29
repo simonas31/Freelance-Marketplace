@@ -29,8 +29,8 @@ const role = computed(() => user.value.role);
                         <tbody v-for="(transaction, index) in transactions">
                             <tr class="even:bg-slate-200 hover:bg-slate-100">
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ transaction.job.job_title }}</td>
-                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ transaction.job.hired_freelancer.freelancer.name + ' ' + transaction.job.hired_freelancer.freelancer.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ transaction.job.hired_freelancer.client.name + ' ' + transaction.job.hired_freelancer.client.name }}</td>
+                                <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ transaction.job.hired_freelancer.freelancer.name + ' ' + transaction.job.hired_freelancer.freelancer.surname }}</td>
                                 <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{{ Math.round((transaction.amount * ((100-transaction.tax)/100)) * 100) / 100 }}</td>   
                             </tr>
                         </tbody>

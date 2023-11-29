@@ -15,7 +15,7 @@ const links = computed(() => {
             links.push({ name: "Applied Freelancers", href: "/applied-freelancers" },
                     { name: 'Hired Freelancers', href: '/hired-freelancers' });
         } else if (user.value.role == ADMIN) {
-            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" }, { name: "Freelancers", href: "/freelancers"});
+            links.push({ name: "Jobs", href: "/confirm-jobs" }, { name: "Users", href: "/users" });
         }
     }
     return links;

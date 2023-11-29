@@ -1,5 +1,7 @@
 <script setup>
 import { CLIENT, FREELANCER, ADMIN} from '../constants';
+import { router } from '@inertiajs/vue3';
+
 const { users } = defineProps(['users']);
 
 const roles = {'1': 'Client', '2': 'Freelancer', '200': 'Admin'};
@@ -15,6 +17,7 @@ const remove = (user_id) => {
     axios.delete(`/api/users/${user_id}`)
     .then(response => {
         usersRef.value.remove()
+        router.get('/users');
     });
 };
 
@@ -75,15 +78,11 @@ import Layout from '../Layout/Layout.vue';
 import { defineProps } from 'vue';
 import { useStore } from 'vuex';
 import { ref, computed } from 'vue';
-import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 
 export default {
     components: { Layout },
     methods: {
-        find(id){
-            router.get('jobs/' + id);
-        }
     },
     title: 'Your jobs',
 }
