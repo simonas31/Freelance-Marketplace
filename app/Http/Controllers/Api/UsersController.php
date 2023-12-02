@@ -230,7 +230,7 @@ class UsersController extends Controller
 
             return response()->json(['deleted successfully']);
         } else {
-            return response()->json(['could not delete user'], 400);
+            return response()->json(['could not find user'], 404);
         }
     }
 

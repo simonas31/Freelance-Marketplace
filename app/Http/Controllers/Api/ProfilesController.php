@@ -14,7 +14,8 @@ class ProfilesController extends Controller
      */
     public function index()
     {
-        return Profile::all();
+
+        return response()->json(Profile::select('country', 'address', 'iban', 'user_id', 'posted')->get());
     }
 
     /**
@@ -87,10 +88,11 @@ class ProfilesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy($profile_id)
+    public function destroy($user_id)
     {
-        if (Profile::find($profile_id)?->delete()) {
+        if (Profile::where('user_id', $user_id)?->delete()) {
             return response()->json(['Deleted successfully']);
         }
+        return response()->json(['Could not find profile, or delete it.'], 404);
     }
 }

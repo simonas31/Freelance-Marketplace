@@ -97,6 +97,7 @@ class RatingsController extends Controller
         if (Rating::find($rating_id)?->delete()) {
             return response()->json(['Deleted successfully']);
         }
+        return response()->json(['Could not find rating'], 404);
     }
 
     public function clientFreelancerRating(Request $request, $freelancer_id, $client_id)

@@ -17,7 +17,7 @@ class PortfoliosController extends Controller
     public function index()
     {
         //find all freelancers name, surname, country, work fields, experience, rating.
-        return response()->json([Portfolio::all()]);
+        return response()->json(Portfolio::all());
     }
 
     /**
@@ -92,5 +92,6 @@ class PortfoliosController extends Controller
         if (Portfolio::where('user_id', $user_id)?->delete()) {
             return response()->json(['Deleted successfully']);
         }
+        return response()->json(['Could not find profile, or delete it.'], 404);
     }
 }

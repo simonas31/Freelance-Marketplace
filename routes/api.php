@@ -75,10 +75,10 @@ Route::group(["middleware" => ["auth:api"]], function () {
     Route::get('jobs', [JobsController::class, 'index']);
     Route::put('users/{user_id}/update_jobs/{job_id}', [JobsController::class, 'updateJob']);
     Route::get('show_job/{user_id}', [JobsController::class, 'show']);
-    Route::patch('jobs/{job_id}', [JobsController::class, 'confirmCreation']);
+    Route::patch('jobs/{job_id}', [JobsController::class, 'confirmCreation']);//
     Route::get('users/{user_id}/jobs', [JobsController::class, 'listUserJobs']);
     Route::post('users/{user_id}/jobs', [JobsController::class, 'store']);
-    Route::put('users/{user_id}/jobs/{job_id}', [JobsController::class, 'update']);
+    Route::put('users/{user_id}/jobs/{job_id}', [JobsController::class, 'update']);//
     Route::delete('users/{user_id}/jobs/{job_id}', [JobsController::class, 'destroy']);
     Route::get('users/{user_id}/jobs/{job_id}', [JobsController::class, 'UserJob']);
 
