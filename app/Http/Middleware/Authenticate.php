@@ -5,8 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
-
-use function Psy\debug;
+use JWTAuth;
 
 class Authenticate extends Middleware
 {
@@ -20,11 +19,37 @@ class Authenticate extends Middleware
 
     public function handle($request, Closure $next, ...$guards)
     {
-        $pattern = '/jwt=([^;]+)/';
-        $cookie = $request->headers->get('cookie') ?? "";
+        $cookies = $request->headers->get('cookie');
 
-        if (preg_match($pattern, $cookie, $matches)) {
-            $request->headers->set('Authorization', 'Bearer ' . $matches[1]);
+        $cookieArray = explode('; ', $cookies);
+        foreach ($cookieArray as $cookie) {
+            list($name, $value) = explode('=', $cookie, 2);
+
+            $name = trim($name);
+            $value = trim($value);
+
+            if ($name === 'jwt') {
+                $accessToken = $value;
+            } elseif ($name === 'refresh_token') {
+                $refreshToken = $value;
+            }
+        }
+
+        if (isset($accessToken)) {
+            $request->headers->set('Authorization', 'Bearer ' . $accessToken);
+        } else if (isset($refreshToken)) {
+            try {
+                $newAccessToken = JWTAuth::setToken($refreshToken)->refresh();
+
+                return $next($request)
+                    ->header('Authorization', 'Bearer ' . $newAccessToken)
+                    ->cookie('jwt', $newAccessToken, 60)
+                    ->cookie('refresh_token', '', 0);
+            } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+                return response()->json(['error' => 'Invalid refresh token'], 401);
+            } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+                return response()->json(['error' => 'Could not refresh tokens'], 500);
+            }
         }
 
         $this->authenticate($request, $guards);

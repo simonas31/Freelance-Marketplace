@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\HiredFreelancer;
 use App\Models\Job;
 use App\Models\User;
+use Config;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class JobsController extends Controller
 {
@@ -16,9 +18,10 @@ class JobsController extends Controller
      */
     public function index(Request $request)
     {
-        $newToken = auth()->refresh();
+        $user = auth()->user();
+        $refresh_token = JWTAuth::fromUser($user);
         $user_id = auth()->id();
-        $cookie = cookie('jwt', $newToken, 60); // 1 hour
+        $cookie = cookie('refresh_token', $refresh_token, Config::get('jwt.refresh_ttl', 20160)); // 2 weeks
 
         $data = $request->all();
         $query = Job::with('user');

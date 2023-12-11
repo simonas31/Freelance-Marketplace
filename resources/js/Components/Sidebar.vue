@@ -86,7 +86,7 @@ const logout = async () => {
                 </div>
                 <div v-else class="mt-auto">
                     <div class="pt-6" @click="toggleSidebarSignal()">
-                        <a @click="logout" class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-blue-400 rounded-xl">Logout</a>
+                        <a @click="logout" class="block px-4 py-3 mb-3 leading-loose text-xs text-center font-semibold bg-blue-400 rounded-xl hover:bg-blue-500 cursor-pointer">Logout</a>
                     </div>
                 </div>
             </nav>

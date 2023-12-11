@@ -12,6 +12,8 @@ use App\Models\Profile;
 use App\Models\Rating;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Auth;
+use Config;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,19 +31,18 @@ class UsersController extends Controller
         ]);
 
         $credentials = $request->only('username', 'password');
-        $token = JWTAuth::attempt($credentials);
 
-        if ($token) {
-            if(User::where([
-                ['username', '=', $request->input('username')],
-                ['confirmed_registration', '=', 1]
-            ])->first() == null){
+        if ($access_token = JWTAuth::attempt($credentials)) {
+            $user = auth()->user();
+            if (!$user->confirmed_registration) {
                 return response()->json([
                     "status" => false,
                     "message" => "Wait for admin to confirm you account."
                 ], 401);
             }
-            return $this->respondWithToken($token, 'User logged in succcessfully');
+
+            $refresh_token = JWTAuth::fromUser($user);
+            return $this->respondWithToken($access_token, 'User logged in succcessfully', $refresh_token);
         }
 
         return response()->json([
@@ -64,7 +65,7 @@ class UsersController extends Controller
         if ($validator->fails())
             return response()->json(['Check if input data is filled'], 406);
 
-        if(User::where('username', $request->input('username'))->first() != null)
+        if (User::where('username', $request->input('username'))->first() != null)
             return response()->json(['message' => 'Username already exists'], 400);
 
         if ($request->hasFile('picture')) {
@@ -136,16 +137,17 @@ class UsersController extends Controller
 
     public function freelancers(Request $request)
     {
-        $newToken = auth()->refresh();
-        $client_id = auth()->id();
-        $cookie = cookie('jwt', $newToken, 60); // 1 hour
+        $user = auth()->user();
+        $refresh_token = JWTAuth::fromUser($user);
+        $user_id = auth()->id();
+        $cookie = cookie('refresh_token', $refresh_token, Config::get('jwt.refresh_ttl', 20160)); // 2 weeks
 
         $data = $request->all();
 
         $query = HiredFreelancer::with(['freelancer.profile', 'freelancer.portfolio', 'freelancer.ratings'])
-        ->leftJoin('jobs', 'hired_freelancers.job_id', '=', 'jobs.id')
-        ->select('hired_freelancers.*', 'jobs.id as job_id', 'jobs.job_title as job_title')
-        ->where('confirmed', '=', 0);
+            ->leftJoin('jobs', 'hired_freelancers.job_id', '=', 'jobs.id')
+            ->select('hired_freelancers.*', 'jobs.id as job_id', 'jobs.job_title as job_title')
+            ->where('confirmed', '=', 0);
 
         if ($data == null) {
             $temp = $query->get()->toArray();
@@ -164,7 +166,7 @@ class UsersController extends Controller
             $searchValues = $data['selectedWorkFields'];
             $query->where(function ($query) use ($searchValues) {
                 foreach ($searchValues as $key => $value) {
-                    $query->orWhere("portfolios.work_fields", 'like', '%'. $value. '%');
+                    $query->orWhere("portfolios.work_fields", 'like', '%' . $value . '%');
                 }
             });
         }
@@ -188,7 +190,7 @@ class UsersController extends Controller
     public function avgRating($ratings)
     {
         $sum = 0;
-        foreach ($ratings as $rating){
+        foreach ($ratings as $rating) {
             $sum += $rating['rating'];
         }
         return $sum / count($ratings);
@@ -238,17 +240,16 @@ class UsersController extends Controller
     {
         User::where('id', $user_id)->update(['confirmed_registration' => 1]);
 
-        return response()->json(['message'=> 'Successfully approved user!']);
+        return response()->json(['message' => 'Successfully approved user!']);
     }
 
     public function logout()
     {
         auth()->logout();
-        Cookie::forget('jwt');
         return response()->json([
             "status" => true,
             "message" => "User logged out successfully"
-        ]);
+        ])->withCookie(Cookie::forget('jwt'))->withCookie(Cookie::forget('refresh_token'));
     }
 
     public function refreshToken()
@@ -265,15 +266,22 @@ class UsersController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token, $message)
+    protected function respondWithToken($token, $message, $refreshToken = null)
     {
-        $cookie = cookie('jwt', $token, 60); // 1 hour
+        $accessCookie = cookie('jwt', $token, 60); // 1 hour
 
-        return response()->json([
+        $response = response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'message' => $message,
-        ])->withCookie($cookie);
+        ])->withCookie($accessCookie);
+
+        if ($refreshToken !== null) {
+            $refreshCookie = cookie('refresh_token', $refreshToken, Config::get('jwt.refresh_ttl', 20160)); // 2 weeks
+            $response->withCookie($refreshCookie);
+        }
+
+        return $response;
     }
 }
