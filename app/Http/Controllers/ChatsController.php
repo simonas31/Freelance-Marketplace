@@ -15,13 +15,11 @@ class ChatsController extends Controller
         $role = $user->role;
         if($role == 1){
             $chats = Chat::where('user_id', $user_id)
-                ->orWhere('receiver', $user_id)
                 ->with('freelancer_receiver.profile')
                 ->get()
                 ->toArray();
         }else if ($role == 2){
             $chats = Chat::where('receiver', $user_id)
-                ->orWhere('user_id', $user_id)
                 ->with('client_receiver.profile')
                 ->get()
                 ->toArray();
