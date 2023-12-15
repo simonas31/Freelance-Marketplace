@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('confirmed')->default(0);
         });
     }
+    
 
     /**
      * Reverse the migrations.
