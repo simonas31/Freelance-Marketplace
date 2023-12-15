@@ -17,10 +17,9 @@ return new class extends Migration
             $table->integer('client_id');
             $table->integer('job_id');
             $table->dateTime('hire_date');
-            $table->integer('confirmed')->default(0);
+            $table->tinyInteger('confirmed')->default(0);
         });
     }
-
 
     /**
      * Reverse the migrations.
